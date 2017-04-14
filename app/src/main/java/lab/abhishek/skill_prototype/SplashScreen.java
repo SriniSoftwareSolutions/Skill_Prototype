@@ -21,8 +21,12 @@ public class SplashScreen extends AppCompatActivity {
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                startActivity(new Intent(SplashScreen.this, LoginScreen.class));
+                if (getSharedPreferences("srini_prefs",MODE_PRIVATE).getBoolean("loggedIn",false)){
+                    startActivity(new Intent(SplashScreen.this, MainActivity.class));
+                } else
+                    startActivity(new Intent(SplashScreen.this, LoginScreen.class));
                 finish();
+
             }
         },2000);
 

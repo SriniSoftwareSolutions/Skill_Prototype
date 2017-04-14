@@ -4,14 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
-    tools:context="lab.abhishek.skill_prototype.LoginScreen">
-
-    <Button
-        android:id="@+id/btn_login"
-        android:layout_width="160sp"
-        android:layout_height="wrap_content"
-        android:text="LOGIN"
-        android:gravity="center"/>
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="lab.abhishek.skill_prototype.MainActivity"
+    tools:showIn="@layout/app_bar_main">
 
 </RelativeLayout>
