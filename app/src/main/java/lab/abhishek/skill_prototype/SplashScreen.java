@@ -1,12 +1,20 @@
 package lab.abhishek.skill_prototype;
 
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.Signature;
 import android.os.Build;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Base64;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
+
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 public class SplashScreen extends AppCompatActivity {
 
@@ -16,12 +24,13 @@ public class SplashScreen extends AppCompatActivity {
         setContentView(R.layout.activity_splash_screen);
 
         fullScreen();
+        getHash();
 
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                if (getSharedPreferences("srini_prefs",MODE_PRIVATE).getBoolean("loggedIn",false)){
+                if (getSharedPreferences("srini_prefs",MODE_PRIVATE).getString("LoggedIn","").length() > 0){
                     startActivity(new Intent(SplashScreen.this, MainActivity.class));
                 } else
                     startActivity(new Intent(SplashScreen.this, LoginScreen.class));
@@ -44,4 +53,19 @@ public class SplashScreen extends AppCompatActivity {
         }
 
     }
+
+    private void getHash() {
+        try{
+            PackageInfo info = getPackageManager().getPackageInfo(
+                    "lab.abhishek.skill_prototype", PackageManager.GET_SIGNATURES);
+            for (Signature signature : info.signatures) {
+                MessageDigest md = MessageDigest.getInstance("SHA");
+                md.update(signature.toByteArray());
+                Log.d("Hash:", Base64.encodeToString(md.digest(), Base64.DEFAULT));
+
+            }
+        } catch (PackageManager.NameNotFoundException | NoSuchAlgorithmException e) {
+        }
+    }
+
 }
