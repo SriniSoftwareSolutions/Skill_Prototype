@@ -218,6 +218,67 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="16dp"
                 android:layout_marginRight="16dp"
+                android:text="Mobile"
+                android:textColor="@color/colorPrimary"
+                android:textSize="10sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_weight="1" >
+
+                <EditText
+                    android:id="@+id/ed_mobile"
+                    android:layout_width="match_parent"
+                    android:layout_height="40sp"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="16dp"
+                    android:layout_weight="1"
+                    android:background="@android:color/transparent"
+                    android:backgroundTint="@android:color/transparent"
+                    android:backgroundTintMode="@android:color/transparent"
+                    android:cursorVisible="true"
+                    android:drawableBottom="@android:color/transparent"
+                    android:ems="10"
+                    android:hint="Mobile"
+                    android:layout_gravity="center_vertical"
+                    android:inputType="number"
+                    android:singleLine="true"
+                    android:textColorHint="@color/colorPrimary_20_percent"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="20sp" />
+
+                <ImageButton
+                    android:layout_width="30sp"
+                    android:layout_height="30sp"
+                    android:layout_gravity="center"
+                    android:layout_marginRight="10sp"
+                    android:src="@mipmap/ic_phone_android_black_24dp"
+                    android:tint="@color/colorPrimary"
+                    android:background="@android:color/transparent"
+                    android:scaleType="centerCrop"/>
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/colorPrimary"
+                android:layout_marginBottom="5dp"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
                 android:text="E-Mail"
                 android:textColor="@color/colorPrimary"
                 android:textSize="10sp" />
