@@ -23,6 +23,8 @@ import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.auth.api.Auth;
@@ -40,6 +42,15 @@ import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.Exclude;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
+
+import org.json.JSONObject;
 
 public class LoginScreen extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener{
 
@@ -50,6 +61,7 @@ public class LoginScreen extends AppCompatActivity implements GoogleApiClient.On
     private GoogleApiClient mClient;
     private EditText et_userName, et_passWord;
     private ProgressDialog pd;
+    private String imageUrl, userName, email;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,6 +113,27 @@ public class LoginScreen extends AppCompatActivity implements GoogleApiClient.On
             @Override
             public void onSuccess(LoginResult loginResult) {
                 FbLoginWithFirebase(loginResult.getAccessToken());
+                GraphRequest request = GraphRequest.newMeRequest(
+                        loginResult.getAccessToken(),
+                        new GraphRequest.GraphJSONObjectCallback(){
+
+                            @Override
+                            public void onCompleted(JSONObject object, GraphResponse response) {
+                                try{
+                                    imageUrl = object.getString("id");
+                                    userName = object.getString("name");
+                                    email = object.getString("email");
+                                } catch (Exception e){
+                                    //
+                                }
+                            }
+                        }
+                );
+                Bundle param = new Bundle();
+                param.putString("fields","id,name,email");
+                request.setParameters(param);
+                request.executeAsync();
+
             }
 
             @Override
@@ -188,11 +221,9 @@ public class LoginScreen extends AppCompatActivity implements GoogleApiClient.On
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
-                        pd.dismiss();
                         if (task.isSuccessful()){
+                            addUser();
                             getSharedPreferences("srini_prefs",MODE_PRIVATE).edit().putString("LoggedIn","Fb").apply();
-                            startActivity(new Intent(LoginScreen.this, MainActivity.class));
-                            finishAffinity();
                         } else
                             Toast.makeText(LoginScreen.this, "Failure!", Toast.LENGTH_SHORT).show();
                     }
@@ -209,12 +240,21 @@ public class LoginScreen extends AppCompatActivity implements GoogleApiClient.On
             if (result.isSuccess()){
                 GoogleSignInAccount account = result.getSignInAccount();
                 firebaseWithGoogle(account);
+                getProfileInfo(account);
             } else
                 Toast.makeText(this, "Login Failed!", Toast.LENGTH_SHORT).show();
 
         } else {
             callbackManager.onActivityResult(requestCode,resultCode, data);
         }
+    }
+
+    private void getProfileInfo(GoogleSignInAccount account) {
+
+        imageUrl = account.getPhotoUrl().toString();
+        userName = account.getDisplayName().toString();
+        email = account.getEmail().toString();
+
     }
 
     private void firebaseWithGoogle(GoogleSignInAccount account) {
@@ -225,15 +265,49 @@ public class LoginScreen extends AppCompatActivity implements GoogleApiClient.On
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
-                        pd.dismiss();
                         if (task.isSuccessful()){
+                            addUser();
                             getSharedPreferences("srini_prefs",MODE_PRIVATE).edit().putString("LoggedIn","Gmail").apply();
-                            startActivity(new Intent(LoginScreen.this, MainActivity.class));
-                            finishAffinity();
+
                         } else
                             Toast.makeText(LoginScreen.this, "Failed!", Toast.LENGTH_SHORT).show();
                     }
                 });
+
+    }
+
+    private void addUser() {
+
+        final DatabaseReference mDatabaseReference = FirebaseDatabase.getInstance().getReference().child("Users");
+        Query myQuery = mDatabaseReference.orderByKey().equalTo(mAuth.getCurrentUser().getUid().toString());
+        myQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.getChildrenCount() == 0){
+
+                    String[] name = userName.split(" ");
+                    DatabaseReference newUser = mDatabaseReference.child(mAuth.getCurrentUser().getUid().toString());
+                    newUser.child("fname").setValue(name[0]);
+                    try{
+                        newUser.child("lname").setValue(""+ name[1]);
+                    } catch (Exception e){
+                        //
+                    }
+                    newUser.child("image_url").setValue(imageUrl);
+                    newUser.child("email").setValue(email);
+                    Toast.makeText(LoginScreen.this, "New User Added!", Toast.LENGTH_SHORT).show();
+
+                }
+                pd.dismiss();
+                startActivity(new Intent(LoginScreen.this, MainActivity.class));
+                finishAffinity();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
 
     }
 

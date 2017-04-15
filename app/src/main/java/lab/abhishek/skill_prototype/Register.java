@@ -8,6 +8,7 @@ import android.location.Criteria;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.support.annotation.NonNull;
@@ -31,21 +32,33 @@ import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.Places;
 import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 public class Register extends AppCompatActivity {
 
-    private EditText et_fname, et_lname, et_email, et_password;
+    private EditText et_fname, et_lname, et_email, et_password, et_confirm_pass, et_mobile;
     private TextView et_location;
     private Button btn_register;
     private FirebaseAuth mAuth;
-    private GoogleApiClient mGoogleApiClient;
+    private DatabaseReference mDatabaseReference;
+    private double lat, lon;
+    private CircleImageView userImage;
+    private Uri imageUri;
+    private ProgressDialog pd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +67,9 @@ public class Register extends AppCompatActivity {
 
         fullScreen();
         mAuth = FirebaseAuth.getInstance();
+        mDatabaseReference = FirebaseDatabase.getInstance().getReference().child("Users");
+        mDatabaseReference.keepSynced(true);
+        pd = new ProgressDialog(this);
 
         btn_register = (Button) findViewById(R.id.btn_register_form);
         et_fname = (EditText) findViewById(R.id.ed_fname);
@@ -61,6 +77,9 @@ public class Register extends AppCompatActivity {
         et_location = (TextView) findViewById(R.id.ed_location);
         et_email = (EditText) findViewById(R.id.ed_email);
         et_password = (EditText) findViewById(R.id.ed_password);
+        et_confirm_pass = (EditText) findViewById(R.id.ed_confirm_password);
+        et_mobile = (EditText) findViewById(R.id.ed_mobile);
+        userImage = (CircleImageView) findViewById(R.id.iv_userImage);
 
 
         btn_register.setOnClickListener(new View.OnClickListener() {
@@ -68,12 +87,16 @@ public class Register extends AppCompatActivity {
             public void onClick(View v) {
                 if (testField()) {
                     if (et_password.getText().toString().length() < 9) {
-                        Toast.makeText(Register.this, "Password must be atleast 8 characters long!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(Register.this, "Password must be atleast 8 characters long!", Toast.LENGTH_LONG).show();
+                    } else if (!et_password.getText().toString().equals(et_confirm_pass.getText().toString())){
+                        Toast.makeText(Register.this, "Passwords does not match!", Toast.LENGTH_LONG).show();
+                    } else if (et_mobile.getText().toString().length() < 10){
+                        Toast.makeText(Register.this, "Mobile Number is less than 10-digits!", Toast.LENGTH_LONG).show();
                     } else {
                         createUserWithFirebase(et_email.getText().toString(), et_password.getText().toString());
                     }
                 } else {
-                    Toast.makeText(Register.this, "Required Fields Cannot Be Left Blank!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(Register.this, "Required Fields Cannot Be Left Blank!", Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -89,6 +112,16 @@ public class Register extends AppCompatActivity {
                 } catch (GooglePlayServicesNotAvailableException e) {
                     e.printStackTrace();
                 }
+            }
+        });
+
+        userImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent();
+                intent.setType("image/*");
+                intent.setAction(Intent.ACTION_PICK);
+                startActivityForResult(Intent.createChooser(intent, "Select Picture"), 201);
             }
         });
 
@@ -111,19 +144,18 @@ public class Register extends AppCompatActivity {
             lm.getBestProvider(criteria, true);
             Location location = getLastLocation();
 
-            double lat = location.getLatitude();
-            double lon = location.getLongitude();
-
             Geocoder geocoder = new Geocoder(Register.this, Locale.getDefault());
             try {
 
+                lat = location.getLatitude();
+                lon = location.getLongitude();
                 List<Address> address = geocoder.getFromLocation(lat, lon, 1);
                 return address.get(0).getLocality().toString();
 
 
             } catch (Exception e) {
                 //
-                return null;
+                return "";
             }
         }
 
@@ -161,15 +193,18 @@ public class Register extends AppCompatActivity {
         if (requestCode == 101 && resultCode == RESULT_OK){
             Place place = PlacePicker.getPlace(data,this);
             et_location.setText(place.getName());
-            Toast.makeText(this, ""+place.getLatLng().toString(), Toast.LENGTH_SHORT).show();
-
+            lat = place.getLatLng().latitude;
+            lon = place.getLatLng().longitude;
+        } else if (requestCode == 201 && resultCode == RESULT_OK){
+            imageUri = data.getData();
+            userImage.setImageURI(imageUri);
         }
 
     }
 
     private void createUserWithFirebase(String s, String s1) {
 
-        final ProgressDialog pd = new ProgressDialog(this);
+
         pd.setTitle("Please Wait!");
         pd.setMessage("Logging In...");
         pd.show();
@@ -178,12 +213,10 @@ public class Register extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
 
-                        pd.dismiss();
+
                         if (task.isSuccessful()){
 
-                            getSharedPreferences("srini_prefs",MODE_PRIVATE).edit().putString("LoggedIn","Email").apply();
-                            startActivity(new Intent(Register.this, MainActivity.class));
-                            finishAffinity();
+                            addUser();
 
                         } else {
                             Toast.makeText(Register.this, "E-mail already used!", Toast.LENGTH_SHORT).show();
@@ -191,6 +224,40 @@ public class Register extends AppCompatActivity {
 
                     }
                 });
+
+    }
+
+    private void addUser() {
+
+        final DatabaseReference newUser = mDatabaseReference.child(mAuth.getCurrentUser().getUid().toString());
+        newUser.keepSynced(true);
+
+        if (imageUri!=null){
+
+            StorageReference filePath = FirebaseStorage.getInstance().getReference().child("UserImage").child(imageUri.getLastPathSegment());
+            filePath.putFile(imageUri).addOnSuccessListener(
+                    new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            //noinspection VisibleForTests
+                            newUser.child("image_url").setValue(taskSnapshot.getDownloadUrl().toString());
+                            pd.dismiss();
+                            getSharedPreferences("srini_prefs",MODE_PRIVATE).edit().putString("LoggedIn","Email").apply();
+                            startActivity(new Intent(Register.this, MainActivity.class));
+                            finishAffinity();
+                        }
+                    }
+            );
+        }
+
+        newUser.child("fname").setValue(et_fname.getText().toString().trim());
+        newUser.child("lname").setValue(et_lname.getText().toString().trim());
+        newUser.child("location").setValue(et_location.getText().toString().trim());
+        newUser.child("latitude").setValue(""+lat);
+        newUser.child("longitude").setValue(""+lon);
+        newUser.child("mobile").setValue(et_mobile.getText().toString().trim());
+        newUser.child("email").setValue(et_email.getText().toString().trim());
+        newUser.child("password").setValue(et_password.getText().toString().trim());
 
     }
 
