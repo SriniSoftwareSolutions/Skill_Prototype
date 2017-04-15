@@ -12,6 +12,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
+import android.view.Gravity;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -21,6 +22,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AdapterView;
+import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
@@ -32,12 +37,24 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    FirebaseAuth mAuth;
+    private FirebaseAuth mAuth;
     private GoogleApiClient mClient;
+    private CircleImageView header_image;
+    private TextView header_name, header_email, header_mob;
+    private DatabaseReference mDatabaseReference;
+    private DrawerLayout drawer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,14 +65,26 @@ public class MainActivity extends AppCompatActivity
 
         mAuth = FirebaseAuth.getInstance();
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ListView mDrawerList = (ListView) findViewById(R.id.drawer_list);
+        mDrawerList.setAdapter(new DrawerAdapter(this));
+        mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
+
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
+
+        View headerView = navigationView.inflateHeaderView(R.layout.nav_header_main);
+        header_image = (CircleImageView) headerView.findViewById(R.id.header_image);
+        header_name = (TextView) headerView.findViewById(R.id.header_name);
+        header_email = (TextView) headerView.findViewById(R.id.header_email);
+        header_mob = (TextView) headerView.findViewById(R.id.header_mob);
+
+        setNavHeader();
+
 
         findViewById(R.id.btn_trainer).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -80,6 +109,37 @@ public class MainActivity extends AppCompatActivity
         } else {
             buildAlertMessageNoGps();
         }
+    }
+
+    private void setNavHeader() {
+
+        mDatabaseReference = FirebaseDatabase.getInstance().getReference().child("Users").child(mAuth.getCurrentUser().getUid().toString());
+        mDatabaseReference.keepSynced(true);
+        mDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                try{
+                    Picasso.with(MainActivity.this).load(dataSnapshot.child("image_url").getValue().toString()).placeholder(R.mipmap.userdp).into(header_image);
+                } catch (Exception e){
+                    Picasso.with(MainActivity.this).load(R.mipmap.userdp).into(header_image);
+                }
+                header_name.setText(dataSnapshot.child("fname").getValue()+" "+dataSnapshot.child("lname").getValue());
+                header_email.setText(dataSnapshot.child("email").getValue().toString());
+                try{
+                    header_mob.setText(dataSnapshot.child("mobile").getValue().toString());
+                } catch (Exception e){
+                    header_mob.setVisibility(View.GONE);
+                }
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
     }
 
     private boolean locationEnabled() {
@@ -233,5 +293,28 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private class DrawerItemClickListener implements ListView.OnItemClickListener{
+
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+            drawer.closeDrawer(GravityCompat.START);
+            switch (position){
+                case 0 :
+                    Toast.makeText(MainActivity.this, "Training", Toast.LENGTH_SHORT).show();
+                    break;
+                case 1 :
+                    Toast.makeText(MainActivity.this, "About Us", Toast.LENGTH_SHORT).show();
+                    break;
+                case 2 :
+                    Toast.makeText(MainActivity.this, "Sign Out", Toast.LENGTH_SHORT).show();
+                    break;
+                case 3 :
+                    finishAffinity();
+            }
+
+        }
     }
 }

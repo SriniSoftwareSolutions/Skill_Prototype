@@ -13,6 +13,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -20,7 +21,11 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.Map;
 
@@ -30,7 +35,7 @@ import static android.content.Context.LOCATION_SERVICE;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class MapFragment extends Fragment implements OnMapReadyCallback, LocationListener {
+public class MapFragment extends Fragment implements OnMapReadyCallback, LocationListener , GoogleMap.OnMarkerClickListener{
 
     private MapView mapView;
     private GoogleMap mGoogleMap;
@@ -38,6 +43,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Locatio
     private LocationManager locationManager;
     private static final long MIN_TIME = 400;
     private static final float MIN_DISTANCE = 1000;
+    private Marker markerP;
 
     public MapFragment() {
         // Required empty public constructor
@@ -82,17 +88,22 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Locatio
         }
         mGoogleMap.setMyLocationEnabled(true);
         mGoogleMap.getUiSettings().setMyLocationButtonEnabled(true);
+        mGoogleMap.getUiSettings().setCompassEnabled(true);
+        mGoogleMap.getUiSettings().setZoomControlsEnabled(true);
         mGoogleMap.moveCamera( CameraUpdateFactory.newLatLngZoom(new LatLng(20.5937,78.9629) , 4.5f) );
+        mGoogleMap.setOnMarkerClickListener(this);
 
+        setUpEventSpots();
 
     }
 
     @Override
     public void onLocationChanged(Location location) {
         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 14);
+        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 8);
         mGoogleMap.animateCamera(cameraUpdate);
         locationManager.removeUpdates(this);
+
     }
 
     @Override
@@ -108,5 +119,36 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Locatio
     @Override
     public void onProviderDisabled(String provider) {
 
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+    }
+
+    private void setUpEventSpots() {
+
+        mGoogleMap.addMarker(new MarkerOptions()
+                .position(new LatLng(19.0760, 72.8777))
+                .title("Mumbai")
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+
+        markerP = mGoogleMap.addMarker(new MarkerOptions()
+                .position(new LatLng(25.5941, 85.1376))
+                .title("Patna")
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+
+    }
+
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+
+        if (marker.equals(markerP)){
+            Toast.makeText(getContext(), "Clicked Patna", Toast.LENGTH_SHORT).show();
+            return true;
+        }
+
+        return false;
     }
 }
