@@ -7,12 +7,9 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
-import android.view.Gravity;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -35,7 +32,6 @@ import com.facebook.login.LoginManager;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -89,7 +85,7 @@ public class MainActivity extends AppCompatActivity
         findViewById(R.id.btn_trainer).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this, Trainers.class));
+                startActivity(new Intent(MainActivity.this, TrainingInfo.class));
             }
         });
 
@@ -303,15 +299,18 @@ public class MainActivity extends AppCompatActivity
             drawer.closeDrawer(GravityCompat.START);
             switch (position){
                 case 0 :
-                    Toast.makeText(MainActivity.this, "Training", Toast.LENGTH_SHORT).show();
+                    startActivity(new Intent(MainActivity.this, TrainingInfo.class));
                     break;
                 case 1 :
                     Toast.makeText(MainActivity.this, "About Us", Toast.LENGTH_SHORT).show();
                     break;
                 case 2 :
-                    Toast.makeText(MainActivity.this, "Sign Out", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "Contact Us", Toast.LENGTH_SHORT).show();
                     break;
                 case 3 :
+                    Toast.makeText(MainActivity.this, "Sign Out", Toast.LENGTH_SHORT).show();
+                    break;
+                case 4 :
                     finishAffinity();
             }
 

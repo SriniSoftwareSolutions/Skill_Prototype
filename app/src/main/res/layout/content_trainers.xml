@@ -1,11 +1,411 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="lab.abhishek.skill_prototype.Trainers"
+    tools:context="lab.abhishek.skill_prototype.TrainingInfo"
     tools:showIn="@layout/activity_trainers">
 
-</android.support.constraint.ConstraintLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <android.support.v7.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="40dp"
+            app:cardBackgroundColor="@color/colorPrimary_10_percent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="20dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="16dp"
+                    android:text="Training Name"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="10sp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1" >
+
+                    <EditText
+                        android:id="@+id/ed_training_name"
+                        android:layout_width="match_parent"
+                        android:layout_height="40sp"
+                        android:layout_marginLeft="16dp"
+                        android:layout_marginRight="16dp"
+                        android:layout_weight="1"
+                        android:background="@android:color/transparent"
+                        android:backgroundTint="@android:color/transparent"
+                        android:backgroundTintMode="@android:color/transparent"
+                        android:cursorVisible="true"
+                        android:drawableBottom="@android:color/transparent"
+                        android:ems="10"
+                        android:hint="Training Name"
+                        android:layout_gravity="center_vertical"
+                        android:inputType="textAutoCorrect"
+                        android:singleLine="true"
+                        android:textColorHint="@color/colorPrimary_20_percent"
+                        android:textColor="@color/colorAccent"
+                        android:textSize="20sp" />
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/colorAccent"
+                    android:layout_marginBottom="5dp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="16dp"
+                    android:text="Location"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="10sp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1" >
+
+                    <TextView
+                        android:id="@+id/ed_training_location"
+                        android:paddingBottom="6sp"
+                        android:layout_width="match_parent"
+                        android:layout_height="40sp"
+                        android:layout_marginLeft="16dp"
+                        android:layout_marginRight="16dp"
+                        android:layout_weight="1"
+                        android:background="@android:color/transparent"
+                        android:backgroundTint="@android:color/transparent"
+                        android:backgroundTintMode="@android:color/transparent"
+                        android:cursorVisible="true"
+                        android:drawableBottom="@android:color/transparent"
+                        android:ems="10"
+                        android:gravity="bottom"
+                        android:hint="Location"
+                        android:layout_gravity="center_vertical"
+                        android:inputType="textAutoCorrect"
+                        android:singleLine="true"
+                        android:textColor="@color/colorAccent"
+                        android:textColorHint="@color/colorPrimary_20_percent"
+                        android:textSize="20sp" />
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/colorAccent"
+                    android:layout_marginBottom="5sp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="16dp"
+                    android:text="Price"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="10sp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1" >
+
+                    <EditText
+                        android:id="@+id/ed_training_price"
+                        android:layout_width="match_parent"
+                        android:layout_height="40sp"
+                        android:layout_marginLeft="16dp"
+                        android:layout_marginRight="16dp"
+                        android:layout_weight="1"
+                        android:background="@android:color/transparent"
+                        android:backgroundTint="@android:color/transparent"
+                        android:backgroundTintMode="@android:color/transparent"
+                        android:cursorVisible="true"
+                        android:drawableBottom="@android:color/transparent"
+                        android:ems="10"
+                        android:hint="Price"
+                        android:layout_gravity="center_vertical"
+                        android:inputType="number"
+                        android:singleLine="true"
+                        android:textColor="@color/colorAccent"
+                        android:textColorHint="@color/colorPrimary_20_percent"
+                        android:textSize="20sp" />
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/colorAccent" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="16dp"
+                    android:layout_marginTop="5sp"
+                    android:text="Mobile"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="10sp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1" >
+
+                    <EditText
+                        android:id="@+id/ed_training_mobile"
+                        android:layout_width="match_parent"
+                        android:layout_height="40sp"
+                        android:layout_marginLeft="16dp"
+                        android:layout_marginRight="16dp"
+                        android:layout_weight="1"
+                        android:background="@android:color/transparent"
+                        android:backgroundTint="@android:color/transparent"
+                        android:backgroundTintMode="@android:color/transparent"
+                        android:cursorVisible="true"
+                        android:drawableBottom="@android:color/transparent"
+                        android:ems="10"
+                        android:hint="Mobile"
+                        android:layout_gravity="center_vertical"
+                        android:inputType="number"
+                        android:singleLine="true"
+                        android:textColor="@color/colorAccent"
+                        android:textColorHint="@color/colorPrimary_20_percent"
+                        android:textSize="20sp" />
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/colorAccent" />
+
+            </LinearLayout>
+
+        </android.support.v7.widget.CardView>
+
+
+        <android.support.v7.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            app:cardBackgroundColor="@color/colorPrimary_10_percent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="20dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:layout_marginLeft="16dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="36dp"
+                        android:layout_height="wrap_content"
+                        android:text="Category"
+                        android:textColor="@color/colorAccent"
+                        android:gravity="left"
+                        android:layout_weight="1"/>
+
+                    <Spinner
+                        android:layout_width="90dp"
+                        android:layout_height="40sp"
+                        android:layout_weight="1"
+                        android:gravity="right"
+                        android:entries="@array/category"
+                        android:backgroundTint="@color/colorAccent"
+                        android:id="@+id/spinner_training_category" />
+
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/colorAccent"
+                    android:layout_marginBottom="5dp"/>
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:layout_marginLeft="16dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="36dp"
+                        android:layout_height="wrap_content"
+                        android:text="Availability"
+                        android:textColor="@color/colorAccent"
+                        android:gravity="left"
+                        android:layout_weight="1"/>
+
+                    <Spinner
+                        android:layout_width="90dp"
+                        android:layout_height="40sp"
+                        android:layout_weight="1"
+                        android:gravity="right"
+                        android:entries="@array/availability"
+                        android:backgroundTint="@color/colorAccent"
+                        android:id="@+id/spinner_training_availability" />
+
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/colorAccent"
+                    android:layout_marginBottom="5dp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="16dp"
+                    android:text="Duration"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="10sp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_weight="1" >
+
+                    <EditText
+                        android:id="@+id/ed_training_duration"
+                        android:layout_width="match_parent"
+                        android:layout_height="40sp"
+                        android:layout_marginLeft="16dp"
+                        android:layout_marginRight="16dp"
+                        android:layout_weight="1"
+                        android:background="@android:color/transparent"
+                        android:backgroundTint="@android:color/transparent"
+                        android:backgroundTintMode="@android:color/transparent"
+                        android:cursorVisible="true"
+                        android:drawableBottom="@android:color/transparent"
+                        android:ems="10"
+                        android:hint="Duration"
+                        android:layout_gravity="center_vertical"
+                        android:inputType="numberDecimal"
+                        android:singleLine="true"
+                        android:textColor="@color/colorAccent"
+                        android:textColorHint="@color/colorPrimary_20_percent"
+                        android:textSize="20sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="hr/day"
+                        android:textSize="18sp"
+                        android:gravity="right|bottom"
+                        android:layout_marginRight="20sp"/>
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/colorAccent" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="16dp"
+                    android:layout_marginBottom="5sp"
+                    android:layout_marginTop="5sp"
+                    android:text="Description"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="10sp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1" >
+
+                    <EditText
+                        android:id="@+id/ed_training_description"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="16dp"
+                        android:layout_marginRight="16dp"
+                        android:layout_weight="1"
+                        android:background="@android:color/transparent"
+                        android:backgroundTint="@android:color/transparent"
+                        android:backgroundTintMode="@android:color/transparent"
+                        android:cursorVisible="true"
+                        android:drawableBottom="@android:color/transparent"
+                        android:ems="10"
+                        android:inputType="textMultiLine"
+                        android:hint="Description"
+                        android:layout_gravity="center_vertical"
+                        android:textColor="@color/colorAccent"
+                        android:textColorHint="@color/colorPrimary_20_percent"
+                        android:textSize="20sp" />
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/colorAccent"
+                    android:layout_marginBottom="5dp"/>
+
+                </LinearLayout>
+
+        </android.support.v7.widget.CardView>
+
+        <Button
+            android:id="@+id/btn_training_create"
+            android:layout_marginLeft="10sp"
+            android:layout_marginRight="10sp"
+            android:layout_marginBottom="20sp"
+            android:layout_width="match_parent"
+            android:layout_height="45sp"
+            android:text="Create Training"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:background="@color/colorPrimary_50_percent"/>
+
+    </LinearLayout>
+
+</android.support.v4.widget.NestedScrollView>

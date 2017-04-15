@@ -7,7 +7,7 @@
 
     <string name="action_settings">Settings</string>
     <string name="title_activity_profile">Profile</string>
-    <string name="title_activity_trainers">Trainers</string>
+    <string name="title_activity_trainers">Training</string>
     <string name="facebook_app_id">1251624021602396</string>
 
     <!-- TODO: Remove or change this placeholder text -->
@@ -22,5 +22,22 @@
     <string name="slide_3_desc">Learn any skill near to your place.</string>
     <string name="play_again_desc">To see the welcome slider again, goto Settings -> apps -> welcome slider -> clear data</string>
     <string name="play_again">Play Again</string>
+
+    <array name="category">
+
+        <item>Sports</item>
+        <item>Games</item>
+        <item>App Dev</item>
+        <item>Technology</item>
+
+    </array>
+
+    <array name="availability">
+
+        <item>Weekdays</item>
+        <item>Weekends</item>
+        <item>Daily</item>
+
+    </array>
 
 </resources>

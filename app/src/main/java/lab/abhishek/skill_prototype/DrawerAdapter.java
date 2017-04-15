@@ -35,8 +35,9 @@ public class DrawerAdapter extends BaseAdapter{
         List<DrawerItem> list = new ArrayList<>();
         list.add(new DrawerItem(0, "Create Training", R.mipmap.card));
         list.add(new DrawerItem(1, "About Us", R.mipmap.team));
-        list.add(new DrawerItem(2, "Sign Out", R.mipmap.exit));
-        list.add(new DrawerItem(3, "Exit",R.mipmap.door));
+        list.add(new DrawerItem(2, "Contact Us", R.mipmap.phonebook));
+        list.add(new DrawerItem(3, "Sign Out", R.mipmap.exit));
+        list.add(new DrawerItem(4, "Exit",R.mipmap.door));
         return list;
     }
 

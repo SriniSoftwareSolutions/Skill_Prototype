@@ -5,6 +5,7 @@
     <color name="colorAccent">#FF4081</color>
     <color name="colorPrimary_50_percent">#9A3F51B5</color>
     <color name="colorPrimary_20_percent">#5A3F51B5</color>
+    <color name="colorPrimary_10_percent">#2A3F51B5</color>
 
     <color name="bg_slider_screen1">#f4b241</color>
     <color name="bg_slider_screen2">#16bc7d</color>
