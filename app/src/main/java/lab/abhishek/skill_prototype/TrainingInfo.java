@@ -291,7 +291,6 @@ public class TrainingInfo extends AppCompatActivity {
 
     class LoadLocation extends AsyncTask<Void , Void, String> {
 
-
         @Override
         protected String doInBackground(Void... params) {
             LocationManager lm = (LocationManager) getSystemService(LOCATION_SERVICE);
@@ -321,6 +320,8 @@ public class TrainingInfo extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String s) {
+            if (s.length() == 0)
+                Toast.makeText(TrainingInfo.this, "Unable to fetch current location!", Toast.LENGTH_SHORT).show();
             et_location.setText(s);
         }
     }
