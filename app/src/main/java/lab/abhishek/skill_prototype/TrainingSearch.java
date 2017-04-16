@@ -94,8 +94,8 @@ public class TrainingSearch extends AppCompatActivity implements SearchView.OnQu
                             mData.getKey(),
                             mData.child("training_name").getValue().toString(),
                             mData.child("location").getValue().toString(),
-                            mData.child("mobile").getValue().toString(),
                             mData.child("price").getValue().toString(),
+                            mData.child("mobile").getValue().toString(),
                             image_url,
                             mData.child("user_id").getValue().toString()
                     );

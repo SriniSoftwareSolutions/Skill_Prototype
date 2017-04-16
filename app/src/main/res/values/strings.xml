@@ -40,5 +40,7 @@
 
     </array>
     <string name="title_activity_training_search">TrainingSearch</string>
+    <string name="title_activity_my_profile">MyProfile</string>
+    <string name="section_format">Hello World from section: %1$d</string>
 
 </resources>
