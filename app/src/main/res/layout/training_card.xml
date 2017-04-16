@@ -27,8 +27,8 @@
                 android:layout_marginRight="8dp"
                 android:scaleType="centerCrop"
                 android:src="@mipmap/userdp"
-                android:layout_width="70sp"
-                android:layout_height="70sp"
+                android:layout_width="60sp"
+                android:layout_height="60sp"
                 android:layout_gravity="center"
                 android:background="@android:color/transparent"/>
 
@@ -47,16 +47,18 @@
                     android:layout_height="wrap_content"
                     android:textSize="12sp"
                     android:layout_weight="1"
+                    android:singleLine="true"
                     android:textColor="@color/colorPrimary"
-                    android:text="Name"/>
+                    android:text="Training"/>
 
                 <TextView
                     android:id="@+id/card_training"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="11sp"
+                    android:singleLine="true"
                     android:layout_weight="1"
-                    android:text="Training"/>
+                    android:text="Location"/>
 
 
                 <TextView
@@ -65,7 +67,7 @@
                     android:layout_height="wrap_content"
                     android:textSize="11sp"
                     android:layout_weight="1"
-                    android:text="Location"/>
+                    android:text="Mobile"/>
 
                 <LinearLayout
                     android:layout_width="wrap_content"

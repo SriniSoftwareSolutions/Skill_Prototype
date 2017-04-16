@@ -39,5 +39,6 @@
         <item>Daily</item>
 
     </array>
+    <string name="title_activity_training_search">TrainingSearch</string>
 
 </resources>

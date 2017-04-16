@@ -33,11 +33,15 @@ import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -56,7 +60,6 @@ public class TrainingInfo extends AppCompatActivity {
     private Spinner sp_avail, sp_cat;
     private FirebaseAuth mAuth;
     private DatabaseReference mData;
-    private StorageReference storage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,6 +88,19 @@ public class TrainingInfo extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         mData = FirebaseDatabase.getInstance().getReference().child("Trainings").child(datetime);
         mData.keepSynced(true);
+
+        String key = getIntent().getStringExtra("key");
+        if (key != null){
+
+            setValues(key);
+            if (getIntent().getStringExtra("action").equals("view"))
+                disableEdits();
+
+        } else {
+
+            new LoadLocation().execute();
+
+        }
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -154,7 +170,55 @@ public class TrainingInfo extends AppCompatActivity {
             }
         });
 
-        new LoadLocation().execute();
+    }
+
+    private void disableEdits() {
+
+        fab.setVisibility(View.INVISIBLE);
+        ed_t_name.setEnabled(false);
+        et_location.setEnabled(false);
+        ed_t_price.setEnabled(false);
+        ed_t_mob.setEnabled(false);
+        sp_avail.setEnabled(false);
+        sp_cat.setEnabled(false);
+        ed_t_dur.setEnabled(false);
+        ed_t_desc.setEnabled(false);
+        btn_create_training.setVisibility(View.GONE);
+
+    }
+
+    private void setValues(String key) {
+
+        final DatabaseReference data = FirebaseDatabase.getInstance().getReference().child("Trainings").child(key);
+        data.keepSynced(true);
+
+        data.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                try {
+                    Picasso.with(TrainingInfo.this).load(dataSnapshot.child("image_url").getValue().toString()).placeholder(R.mipmap.userdp).into(iv_image);
+                } catch (Exception e){
+                    Picasso.with(TrainingInfo.this).load(R.mipmap.userdp).into(iv_image);
+                }
+
+                ed_t_name.setText(dataSnapshot.child("training_name").getValue().toString());
+                et_location.setText(dataSnapshot.child("location").getValue().toString());
+                ed_t_price.setText(dataSnapshot.child("price").getValue().toString());
+                ed_t_mob.setText(dataSnapshot.child("mobile").getValue().toString());
+                sp_cat.setSelection(Integer.parseInt(dataSnapshot.child("category").getValue().toString()));
+                sp_avail.setSelection(Integer.parseInt(dataSnapshot.child("availabilty").getValue().toString()));
+                ed_t_dur.setText(dataSnapshot.child("duration").getValue().toString());
+                if (dataSnapshot.child("description").getValue()!=null)
+                    ed_t_desc.setText(dataSnapshot.child("description").getValue().toString());
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
     }
 
     private boolean isFormFilled() {

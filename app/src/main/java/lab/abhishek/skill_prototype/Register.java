@@ -229,8 +229,19 @@ public class Register extends AppCompatActivity {
 
     private void addUser() {
 
+        getSharedPreferences("srini_prefs",MODE_PRIVATE).edit().putString("LoggedIn","Email").apply();
+
         final DatabaseReference newUser = mDatabaseReference.child(mAuth.getCurrentUser().getUid().toString());
         newUser.keepSynced(true);
+
+        newUser.child("fname").setValue(et_fname.getText().toString().trim());
+        newUser.child("lname").setValue(et_lname.getText().toString().trim());
+        newUser.child("location").setValue(et_location.getText().toString().trim());
+        newUser.child("latitude").setValue(""+lat);
+        newUser.child("longitude").setValue(""+lon);
+        newUser.child("mobile").setValue(et_mobile.getText().toString().trim());
+        newUser.child("email").setValue(et_email.getText().toString().trim());
+        newUser.child("password").setValue(et_password.getText().toString().trim());
 
         if (imageUri!=null){
 
@@ -242,22 +253,16 @@ public class Register extends AppCompatActivity {
                             //noinspection VisibleForTests
                             newUser.child("image_url").setValue(taskSnapshot.getDownloadUrl().toString());
                             pd.dismiss();
-                            getSharedPreferences("srini_prefs",MODE_PRIVATE).edit().putString("LoggedIn","Email").apply();
                             startActivity(new Intent(Register.this, MainActivity.class));
                             finishAffinity();
                         }
                     }
             );
-        }
 
-        newUser.child("fname").setValue(et_fname.getText().toString().trim());
-        newUser.child("lname").setValue(et_lname.getText().toString().trim());
-        newUser.child("location").setValue(et_location.getText().toString().trim());
-        newUser.child("latitude").setValue(""+lat);
-        newUser.child("longitude").setValue(""+lon);
-        newUser.child("mobile").setValue(et_mobile.getText().toString().trim());
-        newUser.child("email").setValue(et_email.getText().toString().trim());
-        newUser.child("password").setValue(et_password.getText().toString().trim());
+        } else {
+            startActivity(new Intent(Register.this, MainActivity.class));
+            finishAffinity();
+        }
 
     }
 
@@ -268,6 +273,7 @@ public class Register extends AppCompatActivity {
                 TextUtils.isEmpty(et_lname.getText().toString()) ||
                 TextUtils.isEmpty(et_location.getText().toString()) ||
                 TextUtils.isEmpty(et_password.getText().toString()))
+
             return false;
 
         return true;
