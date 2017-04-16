@@ -80,7 +80,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Locatio
         btn_my_profile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(getContext(), Profile.class));
+                startActivity(new Intent(getContext(), MyProfile.class));
             }
         });
 
