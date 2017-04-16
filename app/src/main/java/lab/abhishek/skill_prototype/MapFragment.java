@@ -118,7 +118,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Locatio
         }
         mGoogleMap.setMyLocationEnabled(true);
         mGoogleMap.getUiSettings().setMyLocationButtonEnabled(true);
-        //mGoogleMap.getUiSettings().setZoomControlsEnabled(true);
+        mGoogleMap.getUiSettings().setZoomControlsEnabled(true);
         mGoogleMap.getUiSettings().setCompassEnabled(true);
         mGoogleMap.moveCamera( CameraUpdateFactory.newLatLngZoom(new LatLng(20.5937,78.9629) , 4.5f) );
         mGoogleMap.setOnInfoWindowClickListener(this);
@@ -155,7 +155,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Locatio
 
     }
 
-    private void setUpEventSpots() {
+    public void setUpEventSpots() {
 
         markerHashMap = new HashMap<>();
 
