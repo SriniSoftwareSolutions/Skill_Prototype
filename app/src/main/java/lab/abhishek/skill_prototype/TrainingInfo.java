@@ -182,6 +182,14 @@ public class TrainingInfo extends AppCompatActivity {
         mData.child("duration").setValue(ed_t_dur.getText().toString());
         mData.child("description").setValue(ed_t_desc.getText().toString());
 
+        DatabaseReference mUser = FirebaseDatabase.getInstance().getReference().child("Users")
+                .child(mAuth.getCurrentUser().getUid().toString())
+                .child("trainings_created");
+
+        mUser.child(mData.getKey()).setValue(ed_t_name.getText().toString());
+
+        Toast.makeText(this, "Traning Created!", Toast.LENGTH_SHORT).show();
+
         if (imageUri!=null){
             final ProgressDialog pd = new ProgressDialog(TrainingInfo.this);
             pd.setTitle("Please Wait!");
@@ -196,12 +204,14 @@ public class TrainingInfo extends AppCompatActivity {
                             //noinspection VisibleForTests
                             mData.child("image_url").setValue(taskSnapshot.getDownloadUrl().toString());
                             pd.dismiss();
+                            startActivity(new Intent(TrainingInfo.this, MainActivity.class));
                             finish();
                         }
                     }
             );
         } else
-            finish();
+            startActivity(new Intent(TrainingInfo.this, MainActivity.class));
+            finishAffinity();
 
     }
 
@@ -367,7 +377,7 @@ public class TrainingInfo extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
 
         if (item.getItemId() == android.R.id.home){
-            finish();
+            finishAffinity();
             return true;
         }
 

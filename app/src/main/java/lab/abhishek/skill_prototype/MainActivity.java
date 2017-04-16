@@ -80,21 +80,6 @@ public class MainActivity extends AppCompatActivity {
 
         setNavHeader();
 
-
-        findViewById(R.id.btn_trainer).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this, TrainingInfo.class));
-            }
-        });
-
-        findViewById(R.id.btn_profile).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this, Profile.class));
-            }
-        });
-
         FragmentManager fm = getSupportFragmentManager();
         fm.beginTransaction().replace(R.id.content_main, new MapFragment()).commit();
 
@@ -282,6 +267,7 @@ public class MainActivity extends AppCompatActivity {
             switch (position){
                 case 0 :
                     startActivity(new Intent(MainActivity.this, TrainingInfo.class));
+                    finish();
                     break;
                 case 1 :
                     Toast.makeText(MainActivity.this, "About Us", Toast.LENGTH_SHORT).show();
