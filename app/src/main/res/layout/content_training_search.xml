@@ -10,8 +10,6 @@
     
     <android.support.v7.widget.RecyclerView
         android:layout_marginTop="5sp"
-        android:layout_marginLeft="5sp"
-        android:layout_marginRight="5sp"
         android:id="@+id/search_training_rv"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />

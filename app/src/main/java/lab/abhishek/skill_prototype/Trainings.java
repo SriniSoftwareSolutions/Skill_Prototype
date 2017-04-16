@@ -6,17 +6,27 @@ package lab.abhishek.skill_prototype;
 
 public class Trainings {
 
-    private String training_name, location, price, mobile, image_url;
+    private String id,training_name, location, price, mobile, image_url, trainer_id;
 
     public Trainings() {
     }
 
-    public Trainings(String training_name, String location, String price, String mobile, String image_url) {
+    public Trainings(String id, String training_name, String location, String price, String mobile, String image_url, String trainer_id) {
+        this.id = id;
         this.training_name = training_name;
         this.location = location;
         this.price = price;
         this.mobile = mobile;
         this.image_url = image_url;
+        this.trainer_id = trainer_id;
+    }
+
+    public String getId(){
+        return id;
+    }
+
+    public String getTrainer_id(){
+        return trainer_id;
     }
 
     public String getTraining_name() {

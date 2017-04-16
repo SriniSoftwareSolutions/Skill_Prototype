@@ -42,8 +42,7 @@ import com.squareup.picasso.Picasso;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
     private GoogleApiClient mClient;
@@ -200,25 +199,9 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.action_signOut){
-            String tag  = getSharedPreferences("srini_prefs",MODE_PRIVATE).getString("LoggedIn","");
-            getSharedPreferences("srini_prefs",MODE_PRIVATE).edit().putString("LoggedIn","").apply();
-            FirebaseAuth.getInstance().signOut();
 
-            switch (tag){
-                case "Fb" :
-                    fbLogOut();
-                    break;
+            appSignOut();
 
-                case "Gmail" :
-                    googleLogOut();
-                    break;
-
-                case "Email" :
-                    break;
-            }
-
-            startActivity(new Intent(MainActivity.this, LoginScreen.class));
-            finish();
             return true;
         } else if (id == R.id.action_exit){
             finish();
@@ -226,6 +209,30 @@ public class MainActivity extends AppCompatActivity
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void appSignOut() {
+
+        String tag  = getSharedPreferences("srini_prefs",MODE_PRIVATE).getString("LoggedIn","");
+        getSharedPreferences("srini_prefs",MODE_PRIVATE).edit().putString("LoggedIn","").apply();
+        FirebaseAuth.getInstance().signOut();
+
+        switch (tag){
+            case "Fb" :
+                fbLogOut();
+                break;
+
+            case "Gmail" :
+                googleLogOut();
+                break;
+
+            case "Email" :
+                break;
+        }
+
+        startActivity(new Intent(MainActivity.this, LoginScreen.class));
+        finish();
+
     }
 
     private void fbLogOut() {
@@ -266,31 +273,6 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
-        }
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
-    }
-
     private class DrawerItemClickListener implements ListView.OnItemClickListener{
 
         @Override
@@ -308,7 +290,7 @@ public class MainActivity extends AppCompatActivity
                     Toast.makeText(MainActivity.this, "Contact Us", Toast.LENGTH_SHORT).show();
                     break;
                 case 3 :
-                    Toast.makeText(MainActivity.this, "Sign Out", Toast.LENGTH_SHORT).show();
+                    appSignOut();
                     break;
                 case 4 :
                     finishAffinity();

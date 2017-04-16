@@ -123,6 +123,7 @@ public class LoginScreen extends AppCompatActivity implements GoogleApiClient.On
                                     imageUrl = object.getString("id");
                                     userName = object.getString("name");
                                     email = object.getString("email");
+                                    getSharedPreferences("srini_prefs",MODE_PRIVATE).edit().putString("userName",userName).apply();
                                 } catch (Exception e){
                                     //
                                 }
@@ -194,6 +195,26 @@ public class LoginScreen extends AppCompatActivity implements GoogleApiClient.On
                         pd.dismiss();
                         if (task.isSuccessful()){
 
+                            DatabaseReference mData = FirebaseDatabase.getInstance().getReference().child("Users")
+                                    .child(mAuth.getCurrentUser().getUid().toString());
+                            mData.keepSynced(true);
+                            mData.addListenerForSingleValueEvent(new ValueEventListener() {
+
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    getSharedPreferences("srini_prefs",MODE_PRIVATE)
+                                            .edit()
+                                            .putString("userName",dataSnapshot.child("fname").getValue().toString() +
+                                            " " + dataSnapshot.child("lname").getValue().toString() )
+                                            .apply();
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+
+                                }
+                            });
+
                             getSharedPreferences("srini_prefs",MODE_PRIVATE).edit().putString("LoggedIn","Email").apply();
                             startActivity(new Intent(LoginScreen.this, MainActivity.class));
                             finishAffinity();
@@ -254,6 +275,7 @@ public class LoginScreen extends AppCompatActivity implements GoogleApiClient.On
         imageUrl = account.getPhotoUrl().toString();
         userName = account.getDisplayName().toString();
         email = account.getEmail().toString();
+        getSharedPreferences("srini_prefs",MODE_PRIVATE).edit().putString("userName",userName).apply();
 
     }
 

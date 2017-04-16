@@ -37,6 +37,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -82,19 +83,20 @@ public class TrainingInfo extends AppCompatActivity {
         sp_cat = (Spinner) findViewById(R.id.spinner_training_category);
 
         Date dNow = new Date();
-        SimpleDateFormat ft = new SimpleDateFormat("yyMMddhhmmss");
+        SimpleDateFormat ft = new SimpleDateFormat("yyMMddHHmmss");
         String datetime = ft.format(dNow);
 
         mAuth = FirebaseAuth.getInstance();
-        mData = FirebaseDatabase.getInstance().getReference().child("Trainings").child(datetime);
+        mData = FirebaseDatabase.getInstance().getReference().child("Trainings").push();
         mData.keepSynced(true);
 
-        String key = getIntent().getStringExtra("key");
+        final String key = getIntent().getStringExtra("key");
         if (key != null){
 
-            setValues(key);
             if (getIntent().getStringExtra("action").equals("view"))
                 disableEdits();
+
+            setValues(key);
 
         } else {
 
@@ -126,49 +128,80 @@ public class TrainingInfo extends AppCompatActivity {
             }
         });
 
+
+
         btn_create_training.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (isFormFilled()){
 
-                    mData.child("training_name").setValue(ed_t_name.getText().toString());
-                    mData.child("user_id").setValue(mAuth.getCurrentUser().getUid().toString());
-                    mData.child("location").setValue(et_location.getText().toString());
-                    mData.child("lat").setValue(""+lat);
-                    mData.child("lon").setValue(""+lon);
-                    mData.child("price").setValue(ed_t_price.getText().toString());
-                    mData.child("mobile").setValue(ed_t_mob.getText().toString());
-                    mData.child("availabilty").setValue(""+sp_avail.getSelectedItemPosition());
-                    mData.child("category").setValue(""+sp_cat.getSelectedItemPosition());
-                    mData.child("duration").setValue(ed_t_dur.getText().toString());
-                    mData.child("description").setValue(ed_t_desc.getText().toString());
+                //Toast.makeText(getApplicationContext(), ""+btn_create_training.getText().toString(), Toast.LENGTH_SHORT).show();
 
-                    if (imageUri!=null){
-                        final ProgressDialog pd = new ProgressDialog(TrainingInfo.this);
-                        pd.setTitle("Please Wait!");
-                        pd.setMessage("Uploading...");
-                        pd.show();
-                        StorageReference filePath = FirebaseStorage.getInstance().getReference().child("TrainingImages").child(imageUri.getLastPathSegment());
-                        filePath.putFile(imageUri).addOnSuccessListener(
-                                new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                                    @Override
-                                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                if (btn_create_training.getText().toString().equals("Register")){
 
-                                        //noinspection VisibleForTests
-                                        mData.child("image_url").setValue(taskSnapshot.getDownloadUrl().toString());
-                                        pd.dismiss();
-                                        finish();
-                                    }
-                                }
-                        );
-                    } else
-                        finish();
+                    DatabaseReference register = FirebaseDatabase.getInstance().getReference().child("Trainings").child(key);
+                    register.child("registered_users")
+                            .child(mAuth.getCurrentUser().getUid().toString())
+                            .setValue(getSharedPreferences("srini_prefs",MODE_PRIVATE)
+                                .getString("userName",""));
+
+                    register = FirebaseDatabase.getInstance().getReference().child("Users").child(mAuth.getCurrentUser().getUid().toString());
+                    register.child("registered_trainings")
+                            .child(key).setValue(ed_t_name.getText().toString());
+
+                    Toast.makeText(TrainingInfo.this, "You are successfully added to this Training...", Toast.LENGTH_SHORT).show();
+                    finish();
 
                 } else {
-                    Toast.makeText(TrainingInfo.this, "Field cannot be left blank!", Toast.LENGTH_SHORT).show();
+
+                    if (isFormFilled()){
+
+                        saveDataToFirebase();
+
+                    } else {
+                        Toast.makeText(TrainingInfo.this, "Field cannot be left blank!", Toast.LENGTH_SHORT).show();
+                    }
+
                 }
+
             }
         });
+
+    }
+
+    private void saveDataToFirebase() {
+
+        mData.child("training_name").setValue(ed_t_name.getText().toString());
+        mData.child("user_id").setValue(mAuth.getCurrentUser().getUid().toString());
+        mData.child("location").setValue(et_location.getText().toString());
+        mData.child("lat").setValue(""+lat);
+        mData.child("lon").setValue(""+lon);
+        mData.child("price").setValue(ed_t_price.getText().toString());
+        mData.child("mobile").setValue(ed_t_mob.getText().toString());
+        mData.child("availabilty").setValue(""+sp_avail.getSelectedItemPosition());
+        mData.child("category").setValue(""+sp_cat.getSelectedItemPosition());
+        mData.child("duration").setValue(ed_t_dur.getText().toString());
+        mData.child("description").setValue(ed_t_desc.getText().toString());
+
+        if (imageUri!=null){
+            final ProgressDialog pd = new ProgressDialog(TrainingInfo.this);
+            pd.setTitle("Please Wait!");
+            pd.setMessage("Uploading...");
+            pd.show();
+            StorageReference filePath = FirebaseStorage.getInstance().getReference().child("TrainingImages").child(imageUri.getLastPathSegment());
+            filePath.putFile(imageUri).addOnSuccessListener(
+                    new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+
+                            //noinspection VisibleForTests
+                            mData.child("image_url").setValue(taskSnapshot.getDownloadUrl().toString());
+                            pd.dismiss();
+                            finish();
+                        }
+                    }
+            );
+        } else
+            finish();
 
     }
 
@@ -183,7 +216,6 @@ public class TrainingInfo extends AppCompatActivity {
         sp_cat.setEnabled(false);
         ed_t_dur.setEnabled(false);
         ed_t_desc.setEnabled(false);
-        btn_create_training.setVisibility(View.GONE);
 
     }
 
@@ -211,6 +243,29 @@ public class TrainingInfo extends AppCompatActivity {
                 ed_t_dur.setText(dataSnapshot.child("duration").getValue().toString());
                 if (dataSnapshot.child("description").getValue()!=null)
                     ed_t_desc.setText(dataSnapshot.child("description").getValue().toString());
+
+                if (!mAuth.getCurrentUser().getUid().toString().equals(dataSnapshot.child("user_id").getValue().toString())){
+
+                    Query query = data.child("registered_users").orderByKey().equalTo(mAuth.getCurrentUser().getUid().toString());
+                    query.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            if (dataSnapshot.getChildrenCount() ==0 ){
+                                btn_create_training.setVisibility(View.VISIBLE);
+                                btn_create_training.setText("Register");
+                            } else
+                                btn_create_training.setVisibility(View.GONE);
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+
+                } else {
+                    btn_create_training.setVisibility(View.GONE);
+                }
             }
 
             @Override

@@ -30,7 +30,7 @@ public class TrainingHolder extends RecyclerView.ViewHolder {
 
         iv_photo = (ImageView) mView.findViewById(R.id.cardImage);
         tv_name = (TextView) mView.findViewById(R.id.card_name);
-        tv_training = (TextView) mView.findViewById(R.id.card_training);
+        tv_training = (TextView) mView.findViewById(R.id.card_mobile);
         tv_location = (TextView) mView.findViewById(R.id.card_location);
         tv_price = (TextView) mView.findViewById(R.id.card_price);
 
