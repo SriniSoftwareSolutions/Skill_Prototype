@@ -17,13 +17,17 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.telephony.SmsManager;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -50,6 +54,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.ExecutionException;
 
 public class TrainingInfo extends AppCompatActivity {
 
@@ -65,6 +70,8 @@ public class TrainingInfo extends AppCompatActivity {
     private String key;
     private DatabaseReference mData;
     private boolean editAllowed = false, deleteAllowed = false;
+    private LinearLayout ll_editBox;
+    private String trainer_id;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,6 +92,7 @@ public class TrainingInfo extends AppCompatActivity {
         ed_t_desc = (EditText) findViewById(R.id.ed_training_description);
         sp_avail = (Spinner) findViewById(R.id.spinner_training_availability);
         sp_cat = (Spinner) findViewById(R.id.spinner_training_category);
+        ll_editBox = (LinearLayout) findViewById(R.id.ll_editBox);
 
         Date dNow = new Date();
         SimpleDateFormat ft = new SimpleDateFormat("yyMMddHHmmss");
@@ -113,6 +121,15 @@ public class TrainingInfo extends AppCompatActivity {
             new LoadLocation().execute();
 
         }
+
+        ll_editBox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ed_t_desc.requestFocus();
+                InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+                imm.showSoftInput(ed_t_desc, InputMethodManager.SHOW_IMPLICIT);
+            }
+        });
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -148,6 +165,10 @@ public class TrainingInfo extends AppCompatActivity {
 
                 if (btn_create_training.getText().toString().equals("Register")){
 
+                    final ProgressDialog myProg = new ProgressDialog(TrainingInfo.this);
+                    myProg.setTitle("Please Wait!");
+                    myProg.setMessage("Processing Request...");
+                    myProg.show();
                     DatabaseReference register = FirebaseDatabase.getInstance().getReference().child("Trainings").child(key);
                     register.child("registered_users")
                             .child(mAuth.getCurrentUser().getUid().toString())
@@ -158,8 +179,30 @@ public class TrainingInfo extends AppCompatActivity {
                     register.child("registered_trainings")
                             .child(key).setValue(ed_t_name.getText().toString());
 
-                    Toast.makeText(TrainingInfo.this, "You are successfully added to this Training...", Toast.LENGTH_SHORT).show();
-                    finish();
+                    DatabaseReference trainer_ref = FirebaseDatabase.getInstance().getReference().child("Users").child(trainer_id);
+                    trainer_ref.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+
+                            String t_name = dataSnapshot.child("fname").getValue().toString();
+                            SmsManager smsManager = SmsManager.getDefault();
+                            String msg = "I want training for '"+ed_t_name.getText().toString().trim()+"' whose name is '"+t_name+"' with this '"+ed_t_mob.getText().toString()+"'";
+                            myProg.dismiss();
+                            try {
+                                smsManager.sendTextMessage("+918880390936",null,msg,null,null);
+                                Toast.makeText(TrainingInfo.this, "You are successfully added to this Training...", Toast.LENGTH_SHORT).show();
+                                finish();
+                            } catch (Exception e){
+                                Toast.makeText(TrainingInfo.this, "Cannot process request at the moment. Please try again later!", Toast.LENGTH_SHORT).show();
+                            }
+
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
 
                 } else {
 
@@ -245,6 +288,7 @@ public class TrainingInfo extends AppCompatActivity {
         sp_cat.setEnabled(false);
         ed_t_dur.setEnabled(false);
         ed_t_desc.setEnabled(false);
+        ll_editBox.setEnabled(false);
 
     }
 
@@ -263,6 +307,7 @@ public class TrainingInfo extends AppCompatActivity {
                     Picasso.with(TrainingInfo.this).load(R.mipmap.userdp).into(iv_image);
                 }
 
+                trainer_id = dataSnapshot.child("user_id").getValue().toString();
                 ed_t_name.setText(dataSnapshot.child("training_name").getValue().toString());
                 et_location.setText(dataSnapshot.child("location").getValue().toString());
                 ed_t_price.setText(dataSnapshot.child("price").getValue().toString());
@@ -481,8 +526,12 @@ public class TrainingInfo extends AppCompatActivity {
         sp_cat.setEnabled(true);
         ed_t_dur.setEnabled(true);
         ed_t_desc.setEnabled(true);
+        ll_editBox.setEnabled(true);
         btn_create_training.setText("Update");
         btn_create_training.setVisibility(View.VISIBLE);
+        ed_t_name.setSelection(ed_t_name.getText().length()-1);
+        InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+        imm.showSoftInput(ed_t_name, InputMethodManager.SHOW_IMPLICIT);
 
     }
 

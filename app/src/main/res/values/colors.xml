@@ -6,6 +6,7 @@
     <color name="colorPrimary_50_percent">#9A3F51B5</color>
     <color name="colorPrimary_20_percent">#4A3F51B5</color>
     <color name="colorPrimary_10_percent">#2A3F51B5</color>
+    <color name="colorPrimary_5_percent">#153F51B5</color>
     <color name="accent_color_20_percent">#49FF4081</color>
 
     <color name="bg_slider_screen1">#f4b241</color>
