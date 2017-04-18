@@ -5,11 +5,15 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -32,6 +36,7 @@ public class FragTwo extends Fragment {
     private FirebaseAuth mAuth;
     private List<Trainings> trainingsList;
     private RecyclerView recyclerView;
+    private TrainingAdapter adapter;
 
     public FragTwo() {
         // Required empty public constructor
@@ -54,12 +59,13 @@ public class FragTwo extends Fragment {
         recyclerView.setHasFixedSize(true);
         GridLayoutManager lm = new GridLayoutManager(getContext(), 2);
         recyclerView.setLayoutManager(lm);
+        adapter = new TrainingAdapter(trainingsList , getContext());
+        recyclerView.setAdapter(adapter);
 
         query.addListenerForSingleValueEvent(new ValueEventListener() {
 
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-
 
                 for (DataSnapshot mData : dataSnapshot.getChildren()){
 
@@ -76,9 +82,9 @@ public class FragTwo extends Fragment {
                             image_url,
                             mData.child("user_id").getValue().toString()
                     );
+
                     trainingsList.add(training);
-                    TrainingAdapter adapter = new TrainingAdapter(trainingsList , getContext());
-                    recyclerView.setAdapter(adapter);
+                    adapter.notifyDataSetChanged();
 
                 }
 

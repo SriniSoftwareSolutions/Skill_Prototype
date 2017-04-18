@@ -18,6 +18,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -45,6 +46,7 @@ import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -60,7 +62,9 @@ public class TrainingInfo extends AppCompatActivity {
     private EditText ed_t_name, ed_t_price, ed_t_mob, ed_t_dur, ed_t_desc;
     private Spinner sp_avail, sp_cat;
     private FirebaseAuth mAuth;
+    private String key;
     private DatabaseReference mData;
+    private boolean editAllowed = false, deleteAllowed = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,19 +91,25 @@ public class TrainingInfo extends AppCompatActivity {
         String datetime = ft.format(dNow);
 
         mAuth = FirebaseAuth.getInstance();
-        mData = FirebaseDatabase.getInstance().getReference().child("Trainings").push();
+        mData = FirebaseDatabase.getInstance().getReference().child("Trainings");
         mData.keepSynced(true);
 
-        final String key = getIntent().getStringExtra("key");
+        key = getIntent().getStringExtra("key");
         if (key != null){
 
+            mData = mData.child(key);
             if (getIntent().getStringExtra("action").equals("view"))
                 disableEdits();
+            else {
+                btn_create_training.setText("Update");
+                btn_create_training.setVisibility(View.VISIBLE);
+            }
 
             setValues(key);
 
         } else {
 
+            mData = mData.push();
             new LoadLocation().execute();
 
         }
@@ -188,8 +198,6 @@ public class TrainingInfo extends AppCompatActivity {
 
         mUser.child(mData.getKey()).setValue(ed_t_name.getText().toString());
 
-        Toast.makeText(this, "Traning Created!", Toast.LENGTH_SHORT).show();
-
         if (imageUri!=null){
             final ProgressDialog pd = new ProgressDialog(TrainingInfo.this);
             pd.setTitle("Please Wait!");
@@ -204,14 +212,25 @@ public class TrainingInfo extends AppCompatActivity {
                             //noinspection VisibleForTests
                             mData.child("image_url").setValue(taskSnapshot.getDownloadUrl().toString());
                             pd.dismiss();
-                            startActivity(new Intent(TrainingInfo.this, MainActivity.class));
                             finish();
+                            startActivity(new Intent(TrainingInfo.this, MainActivity.class));
+                            if (btn_create_training.getText().equals("Update"))
+                                Toast.makeText(TrainingInfo.this, "Changes Updated!", Toast.LENGTH_SHORT).show();
+                            else
+                                Toast.makeText(TrainingInfo.this, "New Training Created!", Toast.LENGTH_SHORT).show();
+
                         }
                     }
             );
-        } else
+        } else {
+            finish();
             startActivity(new Intent(TrainingInfo.this, MainActivity.class));
-            finishAffinity();
+            if (btn_create_training.getText().equals("Update"))
+                Toast.makeText(TrainingInfo.this, "Changes Updated!", Toast.LENGTH_SHORT).show();
+            else
+                Toast.makeText(TrainingInfo.this, "New Training Created!", Toast.LENGTH_SHORT).show();
+        }
+
 
     }
 
@@ -275,6 +294,8 @@ public class TrainingInfo extends AppCompatActivity {
 
                 } else {
                     btn_create_training.setVisibility(View.GONE);
+                    editAllowed = true;
+                    invalidateOptionsMenu();
                 }
             }
 
@@ -374,14 +395,112 @@ public class TrainingInfo extends AppCompatActivity {
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.training_info_menu, menu);
+        MenuItem item = menu.findItem(R.id.info_edit);
+        if (!editAllowed)
+            item.setVisible(false);
+        if (!deleteAllowed)
+            menu.findItem(R.id.info_delete).setVisible(false);
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
         if (item.getItemId() == android.R.id.home){
+            goBack();
+        } else if (item.getItemId() == R.id.info_edit){
+            enableEdit();
+        } else if (item.getItemId() == R.id.info_delete){
+            deleteTraining();
+            Toast.makeText(this, "Training Deleted!", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(TrainingInfo.this, MyProfile.class));
             finishAffinity();
-            return true;
         }
 
-        return super.onOptionsItemSelected(item);
+        return true;
     }
 
+    private void deleteTraining() {
+
+        final DatabaseReference training_ref = FirebaseDatabase.getInstance().getReference().child("Trainings")
+                .child(key);
+
+        final String[] user_id = new String[1];
+        final List<String> registered_users = new ArrayList<>();
+
+        training_ref.addListenerForSingleValueEvent(new ValueEventListener() {
+
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                user_id[0] = dataSnapshot.child("user_id").getValue().toString();
+
+                for (DataSnapshot mData : dataSnapshot.child("registered_users").getChildren()){
+                    registered_users.add(mData.getKey());
+                }
+
+                DatabaseReference user_ref = FirebaseDatabase.getInstance().getReference()
+                        .child("Users").child(user_id[0]);
+
+                user_ref.child("trainings_created").child(key).removeValue();
+
+                for (String id : registered_users){
+
+                    DatabaseReference reg_ref = FirebaseDatabase.getInstance().getReference()
+                            .child("Users").child(id);
+
+                    reg_ref.child("registered_trainings").child(key).removeValue();
+
+                }
+
+                training_ref.removeValue();
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+    }
+
+    private void enableEdit() {
+
+        editAllowed = false;
+        deleteAllowed = true;
+        invalidateOptionsMenu();
+        fab.setVisibility(View.VISIBLE);
+        ed_t_name.setEnabled(true);
+        et_location.setEnabled(true);
+        ed_t_price.setEnabled(true);
+        ed_t_mob.setEnabled(true);
+        sp_avail.setEnabled(true);
+        sp_cat.setEnabled(true);
+        ed_t_dur.setEnabled(true);
+        ed_t_desc.setEnabled(true);
+        btn_create_training.setText("Update");
+        btn_create_training.setVisibility(View.VISIBLE);
+
+    }
+
+    private void goBack() {
+
+        if (key == null){
+            startActivity(new Intent(TrainingInfo.this, MainActivity.class));
+            finishAffinity();
+        } else {
+            finish();
+        }
+
+    }
+
+    @Override
+    public void onBackPressed() {
+
+        goBack();
+
+    }
 }

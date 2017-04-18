@@ -1,5 +1,6 @@
 package lab.abhishek.skill_prototype;
 import android.content.Intent;
+import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -35,6 +36,7 @@ public class TrainingSearch extends AppCompatActivity implements SearchView.OnQu
     private List<Trainings> trainingsList;
     private List<Trainings> tempList;
     private boolean sort_price, sort_location, sort_name;
+    private double myLat, myLon;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +51,9 @@ public class TrainingSearch extends AppCompatActivity implements SearchView.OnQu
         mDatabaseReference.keepSynced(true);
         trainingsList = new ArrayList<>();
 
+        String latlon[] = getIntent().getStringExtra("myLatLon").split(" ");
+        myLat = Double.parseDouble(latlon[0]);
+        myLon = Double.parseDouble(latlon[1]);
         prepareOriginalList();
 
         //query = mDatabaseReference;
@@ -90,6 +95,14 @@ public class TrainingSearch extends AppCompatActivity implements SearchView.OnQu
                     if (mData.child("image_url").getValue() != null)
                         image_url = mData.child("image_url").getValue().toString();
 
+                    Location curr = new Location("curr");
+                    curr.setLongitude(Double.parseDouble(mData.child("lon").getValue().toString()));
+                    curr.setLatitude(Double.parseDouble(mData.child("lat").getValue().toString()));
+
+                    Location myLoc = new Location("myLoc");
+                    myLoc.setLatitude(myLat);
+                    myLoc.setLongitude(myLon);
+
                     Trainings training = new Trainings(
                             mData.getKey(),
                             mData.child("training_name").getValue().toString(),
@@ -97,7 +110,8 @@ public class TrainingSearch extends AppCompatActivity implements SearchView.OnQu
                             mData.child("price").getValue().toString(),
                             mData.child("mobile").getValue().toString(),
                             image_url,
-                            mData.child("user_id").getValue().toString()
+                            mData.child("user_id").getValue().toString(),
+                            (int) curr.distanceTo(myLoc)
                     );
                     trainingsList.add(training);
 
@@ -202,7 +216,8 @@ public class TrainingSearch extends AppCompatActivity implements SearchView.OnQu
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home){
 
-            finish();
+            startActivity(new Intent(this, MainActivity.class));
+            finishAffinity();
             return true;
 
         } else if (item.getItemId() == R.id.action_filter){
@@ -223,7 +238,7 @@ public class TrainingSearch extends AppCompatActivity implements SearchView.OnQu
                                 Collections.sort(tempList, new Comparator<Trainings>() {
                                     @Override
                                     public int compare(Trainings o1, Trainings o2) {
-                                        return o1.getLocation().compareToIgnoreCase(o2.getLocation());
+                                        return o2.getDist() - o1.getDist();
                                     }
                                 });
                                 sort_location = false;
@@ -233,7 +248,7 @@ public class TrainingSearch extends AppCompatActivity implements SearchView.OnQu
                                 Collections.sort(tempList, new Comparator<Trainings>() {
                                     @Override
                                     public int compare(Trainings o1, Trainings o2) {
-                                        return o2.getLocation().compareToIgnoreCase(o1.getLocation());
+                                        return o1.getDist() - o2.getDist();
                                     }
                                 });
                                 sort_location = true;
@@ -270,7 +285,9 @@ public class TrainingSearch extends AppCompatActivity implements SearchView.OnQu
                                 Collections.sort(tempList, new Comparator<Trainings>() {
                                     @Override
                                     public int compare(Trainings o1, Trainings o2) {
-                                        return o1.getPrice().compareToIgnoreCase(o2.getPrice());
+                                        double price1 = Double.parseDouble(o1.getPrice());
+                                        double price2 = Double.parseDouble(o2.getPrice());
+                                        return Double.compare(price1, price2);
                                     }
                                 });
                                 sort_price = false;
@@ -278,7 +295,9 @@ public class TrainingSearch extends AppCompatActivity implements SearchView.OnQu
                                 Collections.sort(tempList, new Comparator<Trainings>() {
                                     @Override
                                     public int compare(Trainings o1, Trainings o2) {
-                                        return o2.getPrice().compareToIgnoreCase(o1.getPrice());
+                                        double price1 = Double.parseDouble(o1.getPrice());
+                                        double price2 = Double.parseDouble(o2.getPrice());
+                                        return Double.compare(price2, price1);
                                     }
                                 });
                                 sort_price = true;
@@ -295,6 +314,12 @@ public class TrainingSearch extends AppCompatActivity implements SearchView.OnQu
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        startActivity(new Intent(this, MainActivity.class));
+        finishAffinity();
     }
 
     @Override
@@ -322,7 +347,8 @@ public class TrainingSearch extends AppCompatActivity implements SearchView.OnQu
             tempList = new ArrayList<Trainings>();
             for (Trainings train : trainingsList){
 
-                if (train.getTraining_name().toLowerCase().contains(newText.toLowerCase()))
+                if (train.getTraining_name().toLowerCase().contains(newText.toLowerCase()) ||
+                        train.getLocation().toLowerCase().contains(newText.toLowerCase()))
                     tempList.add(train);
 
             }

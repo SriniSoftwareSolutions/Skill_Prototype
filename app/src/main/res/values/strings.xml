@@ -10,8 +10,6 @@
     <string name="title_activity_trainers">Training</string>
     <string name="facebook_app_id">1251624021602396</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_maps">Map</string>
 
     <string name="slide_1_title">Daily Learn New Skill</string>
@@ -39,8 +37,7 @@
         <item>Daily</item>
 
     </array>
-    <string name="title_activity_training_search">TrainingSearch</string>
-    <string name="title_activity_my_profile">MyProfile</string>
-    <string name="section_format">Hello World from section: %1$d</string>
+    <string name="title_activity_training_search">Search Trainings</string>
+    <string name="title_activity_my_profile">My Profile</string>
 
 </resources>

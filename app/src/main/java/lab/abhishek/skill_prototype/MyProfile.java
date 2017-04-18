@@ -1,5 +1,6 @@
 package lab.abhishek.skill_prototype;
 
+import android.content.Intent;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -50,9 +51,30 @@ public class MyProfile extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
 
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+        final TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
 
+        DatabaseReference mData = FirebaseDatabase.getInstance().getReference()
+                .child("Users").child(mAuth.getCurrentUser().getUid().toString());
+        mData.keepSynced(true);
+
+        mData.addListenerForSingleValueEvent(new ValueEventListener() {
+
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                val = dataSnapshot.child("trainings_created").getChildrenCount();
+                tabLayout.getTabAt(1).setText("Created Trainings ("+val+")");
+                val = dataSnapshot.child("registered_trainings").getChildrenCount();
+                tabLayout.getTabAt(2).setText("Registered Trainings ("+val+")");
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
     private void setupViewPager() {
@@ -65,26 +87,25 @@ public class MyProfile extends AppCompatActivity {
 
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-
-        getMenuInflater().inflate(R.menu.menu_my_profile, menu);
-        return true;
-    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
         int id = item.getItemId();
 
-        if (id == R.id.action_settings) {
-            return true;
-        } else if (id == android.R.id.home){
-            finish();
+        if (id == android.R.id.home){
+            startActivity(new Intent(this, MainActivity.class));
+            finishAffinity();
             return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        startActivity(new Intent(this, MainActivity.class));
+        finishAffinity();
     }
 
     /**
@@ -123,48 +144,13 @@ public class MyProfile extends AppCompatActivity {
 
         @Override
         public CharSequence getPageTitle(int position) {
-            DatabaseReference mData = FirebaseDatabase.getInstance().getReference()
-                    .child("Users").child(mAuth.getCurrentUser().getUid().toString());
-            mData.keepSynced(true);
+
             switch (position) {
                 case 0:
                     return "Personal Details";
                 case 1:
-
-                    mData.addListenerForSingleValueEvent(new ValueEventListener() {
-
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-
-                            val = dataSnapshot.child("trainings_created").getChildrenCount();
-
-                        }
-
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-
-                        }
-                    });
-
                     return "Created Trainings";
-
                 case 2:
-
-                    mData.addListenerForSingleValueEvent(new ValueEventListener() {
-
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-
-                            val = dataSnapshot.child("registered_trainings").getChildrenCount();
-
-                        }
-
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-
-                        }
-                    });
-
                     return "Registered Trainings";
             }
             return null;

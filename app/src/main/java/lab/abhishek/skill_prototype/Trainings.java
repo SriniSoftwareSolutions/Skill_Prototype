@@ -7,6 +7,7 @@ package lab.abhishek.skill_prototype;
 public class Trainings {
 
     private String id,training_name, location, price, mobile, image_url, trainer_id;
+    private int dist;
 
     public Trainings() {
     }
@@ -19,6 +20,21 @@ public class Trainings {
         this.mobile = mobile;
         this.image_url = image_url;
         this.trainer_id = trainer_id;
+    }
+
+    public Trainings(String id, String training_name, String location, String price, String mobile, String image_url, String trainer_id, int dist) {
+        this.id = id;
+        this.training_name = training_name;
+        this.location = location;
+        this.price = price;
+        this.mobile = mobile;
+        this.image_url = image_url;
+        this.trainer_id = trainer_id;
+        this.dist = dist;
+    }
+
+    public int getDist(){
+        return dist;
     }
 
     public String getId(){

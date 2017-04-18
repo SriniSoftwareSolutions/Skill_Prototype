@@ -189,7 +189,7 @@ public class MainActivity extends AppCompatActivity {
 
             return true;
         } else if (id == R.id.action_exit){
-            finish();
+            finishAffinity();
             return true;
         }
 
@@ -216,7 +216,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         startActivity(new Intent(MainActivity.this, LoginScreen.class));
-        finish();
+        finishAffinity();
 
     }
 
@@ -267,7 +267,7 @@ public class MainActivity extends AppCompatActivity {
             switch (position){
                 case 0 :
                     startActivity(new Intent(MainActivity.this, TrainingInfo.class));
-                    finish();
+                    finishAffinity();
                     break;
                 case 1 :
                     Toast.makeText(MainActivity.this, "About Us", Toast.LENGTH_SHORT).show();

@@ -2,6 +2,7 @@ package lab.abhishek.skill_prototype;
 
 
 import android.*;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -55,6 +56,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Locatio
     private Marker markerP;
     private Button btn_trainings, btn_my_profile;
     private Map<Marker, String> markerHashMap;
+    private double lat;
+    private double lon;
+    private boolean canGo = false, clicked = false;
+    private double myLat, myLon;
+    private ProgressDialog pd;
 
     public MapFragment() {
         // Required empty public constructor
@@ -69,11 +75,22 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Locatio
 
         btn_trainings = (Button) mView.findViewById(R.id.btn_map_trainings);
         btn_my_profile = (Button) mView.findViewById(R.id.btn_map_my_profile);
+        pd = new ProgressDialog(getContext());
+        pd.setTitle("Please Wait!");
+        pd.setMessage("Getting current location...");
 
         btn_trainings.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(getContext(), TrainingSearch.class));
+                if (canGo){
+                    Intent intent = new Intent(getContext(), TrainingSearch.class);
+                    intent.putExtra("myLatLon",""+myLat+" "+myLon);
+                    startActivity(intent);
+                    getActivity().finishAffinity();
+                } else {
+                    pd.show();
+                    clicked = true;
+                }
             }
         });
 
@@ -81,6 +98,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Locatio
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(getContext(), MyProfile.class));
+                getActivity().finishAffinity();
             }
         });
 
@@ -102,7 +120,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Locatio
             return;
         }
         locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME, MIN_DISTANCE, this);
-        setUpEventSpots();
+
     }
 
     @Override
@@ -131,7 +149,18 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Locatio
         CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 8);
         mGoogleMap.animateCamera(cameraUpdate);
         locationManager.removeUpdates(this);
-
+        myLat = location.getLatitude();
+        myLon = location.getLongitude();
+        setUpEventSpots(location);
+        canGo = true;
+        if (clicked){
+            Intent intent = new Intent(getContext(), TrainingSearch.class);
+            intent.putExtra("myLatLon",""+myLat+" "+myLon);
+            startActivity(intent);
+            if (pd.isShowing())
+                pd.dismiss();
+            getActivity().finishAffinity();
+        }
     }
 
     @Override
@@ -155,7 +184,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Locatio
 
     }
 
-    public void setUpEventSpots() {
+    public void setUpEventSpots(final Location myLocation) {
 
         markerHashMap = new HashMap<>();
 
@@ -168,12 +197,17 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Locatio
             public void onDataChange(DataSnapshot dataSnapshot) {
 
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()){
+                    lat = Double.parseDouble(snapshot.child("lat").getValue().toString());
+                    lon = Double.parseDouble(snapshot.child("lon").getValue().toString());
+                    Location loc = new Location("loc");
+                    loc.setLatitude(lat);
+                    loc.setLongitude(lon);
                     Marker marker = mGoogleMap.addMarker(new MarkerOptions()
                     .position(new LatLng(Double.parseDouble(snapshot.child("lat").getValue().toString()),
                             Double.parseDouble(snapshot.child("lon").getValue().toString())))
                     .title(snapshot.child("training_name").getValue().toString())
                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
-                    .snippet("Rs. "+snapshot.child("price").getValue().toString())
+                    .snippet((int) myLocation.distanceTo(loc)/1000 + " km"+", " + "Rs. "+snapshot.child("price").getValue().toString())
                     );
                     String key = snapshot.getKey().toString();
                     marker.showInfoWindow();
