@@ -59,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         mAuth = FirebaseAuth.getInstance();
+        setTitle("Search Trainer Here");
 
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ListView mDrawerList = (ListView) findViewById(R.id.drawer_list);
@@ -80,12 +81,10 @@ public class MainActivity extends AppCompatActivity {
 
         setNavHeader();
 
-        FragmentManager fm = getSupportFragmentManager();
-        fm.beginTransaction().replace(R.id.content_main, new MapFragment()).commit();
-
         takePermissions();
         if (locationEnabled()){
-            //startActivity(new Intent(this, MapsActivity.class));
+            FragmentManager fm = getSupportFragmentManager();
+            fm.beginTransaction().replace(R.id.content_main, new MapFragment()).commit();
         } else {
             buildAlertMessageNoGps();
         }
@@ -148,6 +147,8 @@ public class MainActivity extends AppCompatActivity {
                 .setCancelable(false)
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     public void onClick(final DialogInterface dialog, final int id) {
+                        FragmentManager fm = getSupportFragmentManager();
+                        fm.beginTransaction().replace(R.id.content_main, new MapFragment()).commit();
                         startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
                     }
                 })
@@ -193,7 +194,7 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
 
-        return super.onOptionsItemSelected(item);
+        return false;
     }
 
     private void appSignOut() {

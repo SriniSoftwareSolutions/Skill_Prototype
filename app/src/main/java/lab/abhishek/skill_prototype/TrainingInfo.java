@@ -59,7 +59,7 @@ import java.util.concurrent.ExecutionException;
 public class TrainingInfo extends AppCompatActivity {
 
     private double lat, lon;
-    private TextView et_location;
+    private TextView et_location, tv_change_location;
     private ImageView iv_image;
     private Uri imageUri;
     private FloatingActionButton fab;
@@ -93,10 +93,7 @@ public class TrainingInfo extends AppCompatActivity {
         sp_avail = (Spinner) findViewById(R.id.spinner_training_availability);
         sp_cat = (Spinner) findViewById(R.id.spinner_training_category);
         ll_editBox = (LinearLayout) findViewById(R.id.ll_editBox);
-
-        Date dNow = new Date();
-        SimpleDateFormat ft = new SimpleDateFormat("yyMMddHHmmss");
-        String datetime = ft.format(dNow);
+        tv_change_location = (TextView) findViewById(R.id.tv_change_location);
 
         mAuth = FirebaseAuth.getInstance();
         mData = FirebaseDatabase.getInstance().getReference().child("Trainings");
@@ -155,7 +152,19 @@ public class TrainingInfo extends AppCompatActivity {
             }
         });
 
-
+        tv_change_location.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
+                try {
+                    startActivityForResult(builder.build(TrainingInfo.this), 101);
+                } catch (GooglePlayServicesRepairableException e) {
+                    e.printStackTrace();
+                } catch (GooglePlayServicesNotAvailableException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
 
         btn_create_training.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -186,7 +195,7 @@ public class TrainingInfo extends AppCompatActivity {
 
                             String t_name = dataSnapshot.child("fname").getValue().toString();
                             SmsManager smsManager = SmsManager.getDefault();
-                            String msg = "I want training for '"+ed_t_name.getText().toString().trim()+"' whose name is '"+t_name+"' with this '"+ed_t_mob.getText().toString()+"'";
+                            String msg = "I want training for '"+ed_t_name.getText().toString().trim()+"' ,trainer name is '"+t_name+"' with contact '"+ed_t_mob.getText().toString()+"'";
                             myProg.dismiss();
                             try {
                                 smsManager.sendTextMessage("+918880390936",null,msg,null,null);
@@ -289,6 +298,7 @@ public class TrainingInfo extends AppCompatActivity {
         ed_t_dur.setEnabled(false);
         ed_t_desc.setEnabled(false);
         ll_editBox.setEnabled(false);
+        tv_change_location.setVisibility(View.INVISIBLE);
 
     }
 
@@ -527,6 +537,7 @@ public class TrainingInfo extends AppCompatActivity {
         ed_t_dur.setEnabled(true);
         ed_t_desc.setEnabled(true);
         ll_editBox.setEnabled(true);
+        tv_change_location.setVisibility(View.VISIBLE);
         btn_create_training.setText("Update");
         btn_create_training.setVisibility(View.VISIBLE);
         ed_t_name.setSelection(ed_t_name.getText().length()-1);

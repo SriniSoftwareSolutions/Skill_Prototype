@@ -23,10 +23,19 @@
 
     <array name="category">
 
-        <item>Sports</item>
-        <item>Games</item>
-        <item>App Dev</item>
         <item>Technology</item>
+        <item>DIY</item>
+        <item>Music</item>
+        <item>Photography</item>
+        <item>Culinary</item>
+        <item>Gardening</item>
+        <item>Living</item>
+        <item>Dance</item>
+        <item>Art</item>
+        <item>Summer Camps</item>
+        <item>Sports</item>
+        <item>Language</item>
+        <item>Crafts and Creativity</item>
 
     </array>
 

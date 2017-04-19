@@ -7,6 +7,7 @@
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="lab.abhishek.skill_prototype.TrainingInfo"
+    android:background="@color/colorPrimary_20_percent"
     tools:showIn="@layout/activity_trainers">
 
 
@@ -21,7 +22,7 @@
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
             android:layout_marginTop="40dp"
-            app:cardBackgroundColor="@color/colorPrimary_5_percent">
+            >
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -111,6 +112,16 @@
                         android:textColor="@color/colorPrimary"
                         android:textColorHint="@color/colorPrimary_20_percent"
                         android:textSize="20sp" />
+
+                    <TextView
+                        android:id="@+id/tv_change_location"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Click to change"
+                        android:textColor="@color/colorAccent"
+                        android:textSize="10sp"
+                        android:layout_gravity="bottom"
+                        android:paddingBottom="7sp"/>
 
                 </LinearLayout>
 
@@ -216,8 +227,7 @@
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
             android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"
-            app:cardBackgroundColor="@color/colorPrimary_5_percent">
+            android:layout_marginBottom="10dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -362,13 +372,15 @@
                 <LinearLayout
                     android:id="@+id/ll_editBox"
                     android:layout_width="match_parent"
-                    android:layout_height="100sp"
+                    android:layout_height="wrap_content"
                     android:gravity="top"
+                    android:minHeight="100sp"
                     android:layout_marginTop="3dp"
                     android:background="@drawable/edittext_layout"
                     android:layout_weight="1" >
 
                     <EditText
+                        android:nestedScrollingEnabled="true"
                         android:id="@+id/ed_training_description"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"

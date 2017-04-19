@@ -16,6 +16,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -37,6 +39,7 @@ public class TrainingSearch extends AppCompatActivity implements SearchView.OnQu
     private List<Trainings> tempList;
     private boolean sort_price, sort_location, sort_name;
     private double myLat, myLon;
+    private SearchView searchView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +67,7 @@ public class TrainingSearch extends AppCompatActivity implements SearchView.OnQu
         GridLayoutManager lm = new GridLayoutManager(this, 2);
         recyclerView.setLayoutManager(lm);
 
+
         recyclerView.addOnItemTouchListener(new RecyclerTouchListener(TrainingSearch.this,
                 recyclerView,
                 new RecyclerTouchListener.OnItemClickListener() {
@@ -80,6 +84,14 @@ public class TrainingSearch extends AppCompatActivity implements SearchView.OnQu
 
                     }
                 }));
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+
 
     }
 
@@ -137,80 +149,6 @@ public class TrainingSearch extends AppCompatActivity implements SearchView.OnQu
 
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-
-        /*final FirebaseRecyclerAdapter<Trainings, TrainingHolder> mFirebaseAdapter =
-                new FirebaseRecyclerAdapter<Trainings, TrainingHolder>(
-                        Trainings.class,
-                        R.layout.training_card,
-                        TrainingHolder.class,
-                        query
-                ) {
-                    @Override
-                    protected void populateViewHolder(TrainingHolder viewHolder, Trainings model, int position) {
-                        final String key = getRef(position).getKey();
-                        viewHolder.setvalues(model.getTraining_name(), model.getLocation(), model.getMobile(), model.getPrice(),model.getImage_url(), getApplicationContext());
-                        //progressDialog.dismiss();
-
-                        viewHolder.cardView.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                Intent intent = new Intent(TrainingSearch.this, TrainingInfo.class);
-                                intent.putExtra("key",key);
-                                intent.putExtra("action","view");
-                                startActivity(intent);
-                            }
-                        });
-
-                        viewHolder.cardView.setOnLongClickListener(new View.OnLongClickListener() {
-                            @Override
-                            public boolean onLongClick(View v) {
-
-                                PopupMenu popup = new PopupMenu(v.getContext(),v);
-                                MenuInflater inflater = popup.getMenuInflater();
-                                inflater.inflate(R.menu.popup_options, popup.getMenu());
-                                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                                    @Override
-                                    public boolean onMenuItemClick(MenuItem item) {
-
-                                        Intent intent = new Intent(TrainingSearch.this, TrainingInfo.class);
-
-                                        switch (item.getItemId()){
-
-                                            case R.id.action_view :
-                                                intent.putExtra("key",key);
-                                                intent.putExtra("action","view");
-                                                startActivity(intent);
-                                                return true;
-
-                                            case R.id.action_edit :
-                                                intent.putExtra("key",key);
-                                                intent.putExtra("action","edit");
-                                                startActivity(intent);
-                                                return true;
-
-                                            case R.id.action_delete :
-                                                mDatabaseReference.child(key).removeValue();
-                                                return true;
-                                        }
-
-                                        return false;
-                                    }
-                                });
-                                popup.show();
-                                return true;
-
-                            }
-                        });
-
-                    }
-                }; */
-
-
-
-    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -242,6 +180,7 @@ public class TrainingSearch extends AppCompatActivity implements SearchView.OnQu
                                     }
                                 });
                                 sort_location = false;
+                                Toast.makeText(TrainingSearch.this, "Farthest location first", Toast.LENGTH_SHORT).show();
 
                             } else {
 
@@ -252,6 +191,7 @@ public class TrainingSearch extends AppCompatActivity implements SearchView.OnQu
                                     }
                                 });
                                 sort_location = true;
+                                Toast.makeText(TrainingSearch.this, "Nearest location first", Toast.LENGTH_SHORT).show();
 
                             }
                             updateList();
@@ -267,6 +207,7 @@ public class TrainingSearch extends AppCompatActivity implements SearchView.OnQu
                                     }
                                 });
                                 sort_name = false;
+                                Toast.makeText(TrainingSearch.this, "Name Ascending", Toast.LENGTH_SHORT).show();
                             } else {
                                 Collections.sort(tempList, new Comparator<Trainings>() {
                                     @Override
@@ -275,6 +216,7 @@ public class TrainingSearch extends AppCompatActivity implements SearchView.OnQu
                                     }
                                 });
                                 sort_name = true;
+                                Toast.makeText(TrainingSearch.this, "Name Descending", Toast.LENGTH_SHORT).show();
                             }
                             updateList();
                             break;
@@ -291,6 +233,7 @@ public class TrainingSearch extends AppCompatActivity implements SearchView.OnQu
                                     }
                                 });
                                 sort_price = false;
+                                Toast.makeText(TrainingSearch.this, "Lowest price first", Toast.LENGTH_SHORT).show();
                             } else {
                                 Collections.sort(tempList, new Comparator<Trainings>() {
                                     @Override
@@ -301,6 +244,7 @@ public class TrainingSearch extends AppCompatActivity implements SearchView.OnQu
                                     }
                                 });
                                 sort_price = true;
+                                Toast.makeText(TrainingSearch.this, "Highest price first", Toast.LENGTH_SHORT).show();
                             }
                             updateList();
                             break;
@@ -326,9 +270,13 @@ public class TrainingSearch extends AppCompatActivity implements SearchView.OnQu
     public boolean onCreateOptionsMenu(Menu menu) {
 
         getMenuInflater().inflate(R.menu.search_training_menu, menu);
-        MenuItem item = menu.findItem(R.id.action_search);
-        SearchView searchView = (SearchView) MenuItemCompat.getActionView(item);
+        MenuItem menuItem = menu.findItem(R.id.action_search);
+        searchView = (SearchView) MenuItemCompat.getActionView(menuItem);
         searchView.setOnQueryTextListener(this);
+
+        if (getIntent().getBooleanExtra("search",false))
+            MenuItemCompat.expandActionView(menuItem);
+
 
         return true;
     }

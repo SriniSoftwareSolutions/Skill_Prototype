@@ -13,6 +13,8 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -58,7 +60,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Locatio
     private Map<Marker, String> markerHashMap;
     private double lat;
     private double lon;
-    private boolean canGo = false, clicked = false;
+    private boolean canGo = false, clicked = false, hasTraining = false;
     private double myLat, myLon;
     private ProgressDialog pd;
 
@@ -66,6 +68,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Locatio
         // Required empty public constructor
     }
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -78,6 +85,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Locatio
         pd = new ProgressDialog(getContext());
         pd.setTitle("Please Wait!");
         pd.setMessage("Getting current location...");
+
+        Toast.makeText(getContext(), "Press 'All Trainings' to list all trainings.", Toast.LENGTH_SHORT).show();
 
         btn_trainings.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -104,6 +113,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Locatio
 
         return mView;
     }
+
+
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
@@ -212,7 +223,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Locatio
                     String key = snapshot.getKey().toString();
                     marker.showInfoWindow();
                     markerHashMap.put(marker, key);
+
+                    if (((int) myLocation.distanceTo(loc)/1000) < 20)
+                        hasTraining = true;
+
                 }
+
+                if (!hasTraining)
+                    Toast.makeText(getContext(), "No Training found within 20 km of radius. Please try searching...", Toast.LENGTH_SHORT).show();
 
             }
 
@@ -233,4 +251,29 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Locatio
         startActivity(intent);
 
     }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.main_search){
+            if (canGo){
+                Intent intent = new Intent(getContext(), TrainingSearch.class);
+                intent.putExtra("search", true);
+                intent.putExtra("myLatLon",""+myLat+" "+myLon);
+                startActivity(intent);
+                getActivity().finish();
+            } else {
+                pd.show();
+                clicked = true;
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (isVisibleToUser && isResumed())
+            onResume();
+    }
+
 }

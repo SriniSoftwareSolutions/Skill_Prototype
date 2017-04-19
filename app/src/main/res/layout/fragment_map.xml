@@ -22,7 +22,7 @@
             android:layout_weight="1"
             android:layout_width="match_parent"
             android:layout_height="40sp"
-            android:text="Trainings"
+            android:text="All Trainings"
             android:textColor="@android:color/white"
             android:background="@color/colorAccent"/>
 

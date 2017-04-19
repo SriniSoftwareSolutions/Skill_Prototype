@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/main_search"
+        android:title="Search"
+        android:icon="@mipmap/ic_search_white_24dp"
+        app:showAsAction="always"
+        android:orderInCategory="100" />
+
     <item
         android:id="@+id/action_signOut"
         android:orderInCategory="100"
