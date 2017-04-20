@@ -66,7 +66,7 @@ public class SplashScreen extends AppCompatActivity {
         } else {
             buildAlertMessageNoGps();
         }
-        //getHash();
+        getHash();
 
         viewPager = (ViewPager) findViewById(R.id.view_pager);
         dotsLayout = (LinearLayout) findViewById(R.id.layoutDots);

@@ -264,7 +264,11 @@ public class FragOne extends Fragment {
 
                 }
 
-                email.setText(data.child("email").getValue().toString());
+               try{
+                   email.setText(data.child("email").getValue().toString());
+               } catch (Exception e){
+                   //
+               }
             }
 
             @Override

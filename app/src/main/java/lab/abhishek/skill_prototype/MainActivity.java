@@ -50,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView header_name, header_email, header_mob;
     private DatabaseReference mDatabaseReference;
     private DrawerLayout drawer;
+    private boolean isOpen;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,6 +86,7 @@ public class MainActivity extends AppCompatActivity {
         if (locationEnabled()){
             FragmentManager fm = getSupportFragmentManager();
             fm.beginTransaction().replace(R.id.content_main, new MapFragment()).commit();
+            isOpen = true;
         } else {
             buildAlertMessageNoGps();
         }
@@ -104,7 +106,11 @@ public class MainActivity extends AppCompatActivity {
                     Picasso.with(MainActivity.this).load(R.mipmap.userdp).into(header_image);
                 }
                 header_name.setText(dataSnapshot.child("fname").getValue()+" "+dataSnapshot.child("lname").getValue());
-                header_email.setText(dataSnapshot.child("email").getValue().toString());
+                try{
+                    header_email.setText(dataSnapshot.child("email").getValue().toString());
+                } catch (Exception e){
+                    //
+                }
                 try{
                     header_mob.setText(dataSnapshot.child("mobile").getValue().toString());
                 } catch (Exception e){
@@ -168,7 +174,12 @@ public class MainActivity extends AppCompatActivity {
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+            if (isOpen)
+                super.onBackPressed();
+            else {
+                getSupportFragmentManager().beginTransaction().replace(R.id.content_main, new MapFragment()).commit();
+                isOpen = true;
+            }
         }
     }
 
@@ -267,14 +278,17 @@ public class MainActivity extends AppCompatActivity {
             drawer.closeDrawer(GravityCompat.START);
             switch (position){
                 case 0 :
+                    isOpen = false;
                     startActivity(new Intent(MainActivity.this, TrainingInfo.class));
                     finishAffinity();
                     break;
                 case 1 :
-                    Toast.makeText(MainActivity.this, "About Us", Toast.LENGTH_SHORT).show();
+                    isOpen = false;
+                    getSupportFragmentManager().beginTransaction().replace(R.id.content_main, new FragAboutUs()).commit();
                     break;
                 case 2 :
-                    Toast.makeText(MainActivity.this, "Contact Us", Toast.LENGTH_SHORT).show();
+                    isOpen = false;
+                    getSupportFragmentManager().beginTransaction().replace(R.id.content_main, new FragContactUs()).commit();
                     break;
                 case 3 :
                     appSignOut();

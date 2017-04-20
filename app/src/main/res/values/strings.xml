@@ -20,6 +20,8 @@
     <string name="slide_3_desc">Learn any skill near to your place.</string>
     <string name="play_again_desc">To see the welcome slider again, goto Settings -> apps -> welcome slider -> clear data</string>
     <string name="play_again">Play Again</string>
+    <string name="aboutUs1">Short Description</string>
+    <string name="aboutUs2">Some Long Description</string>
 
     <array name="category">
 
@@ -48,5 +50,8 @@
     </array>
     <string name="title_activity_training_search">Search Trainings</string>
     <string name="title_activity_my_profile">My Profile</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>
