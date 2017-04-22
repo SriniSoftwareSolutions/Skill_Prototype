@@ -3,6 +3,7 @@ package lab.abhishek.skill_prototype;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.location.Address;
 import android.location.Criteria;
 import android.location.Geocoder;
@@ -12,6 +13,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -36,7 +38,9 @@ import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -49,6 +53,7 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 
+import java.io.ByteArrayOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -255,8 +260,8 @@ public class TrainingInfo extends AppCompatActivity {
             pd.setTitle("Please Wait!");
             pd.setMessage("Uploading...");
             pd.show();
-            StorageReference filePath = FirebaseStorage.getInstance().getReference().child("TrainingImages").child(imageUri.getLastPathSegment());
-            filePath.putFile(imageUri).addOnSuccessListener(
+            StorageReference filePath = FirebaseStorage.getInstance().getReference().child("TrainingImages").child(mData.getKey());
+            /*filePath.putFile(imageUri).addOnSuccessListener(
                     new OnSuccessListener<UploadTask.TaskSnapshot>() {
                         @Override
                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
@@ -273,7 +278,27 @@ public class TrainingInfo extends AppCompatActivity {
 
                         }
                     }
-            );
+            );*/
+            iv_image.setDrawingCacheEnabled(true);
+            iv_image.buildDrawingCache();
+            Bitmap bitmap = iv_image.getDrawingCache();
+            ByteArrayOutputStream boas = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, boas);
+            byte[] data = boas.toByteArray();
+            filePath.putBytes(data).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    //noinspection VisibleForTests
+                    mData.child("image_url").setValue(taskSnapshot.getDownloadUrl().toString());
+                    pd.dismiss();
+                    finish();
+                    startActivity(new Intent(TrainingInfo.this, MainActivity.class));
+                    if (btn_create_training.getText().equals("Update"))
+                        Toast.makeText(TrainingInfo.this, "Changes Updated!", Toast.LENGTH_SHORT).show();
+                    else
+                        Toast.makeText(TrainingInfo.this, "New Training Created!", Toast.LENGTH_SHORT).show();
+                }
+            });
         } else {
             finish();
             startActivity(new Intent(TrainingInfo.this, MainActivity.class));

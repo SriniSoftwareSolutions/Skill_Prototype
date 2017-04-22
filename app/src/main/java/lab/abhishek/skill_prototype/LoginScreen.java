@@ -109,6 +109,7 @@ public class LoginScreen extends AppCompatActivity implements GoogleApiClient.On
         }
 
         callbackManager = CallbackManager.Factory.create();
+        fb_login.setReadPermissions("email");
         fb_login.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
