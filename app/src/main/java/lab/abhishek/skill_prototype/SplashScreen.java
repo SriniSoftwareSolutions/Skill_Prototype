@@ -56,6 +56,7 @@ public class SplashScreen extends AppCompatActivity {
         }
 
         getSharedPreferences("srini_prefs",MODE_PRIVATE).edit().putBoolean("firstTime",false).apply();
+        getSharedPreferences("srini_prefs",MODE_PRIVATE).edit().putBoolean("once",true).apply();
 
         setContentView(R.layout.activity_splash_screen);
 

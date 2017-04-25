@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
+import android.view.Gravity;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -89,6 +90,15 @@ public class MainActivity extends AppCompatActivity {
             isOpen = true;
         } else {
             buildAlertMessageNoGps();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (getSharedPreferences("srini_prefs",MODE_PRIVATE).getBoolean("once",true)) {
+            drawer.openDrawer(Gravity.START);
+            getSharedPreferences("srini_prefs",MODE_PRIVATE).edit().putBoolean("once",false).apply();
         }
     }
 
